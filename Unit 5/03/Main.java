@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-class Main {
+public class Main {
     public static Scanner s = new Scanner(System.in);
     public static void main(String[] args) {
         //DO NOT ALTER - this will get your numbers into 2 user entered Arrays

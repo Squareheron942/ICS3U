@@ -31,7 +31,7 @@ public class Main {
             output += i != 9 ? ((i + 1) + "      " + o[i] + "\n") : ((i + 1) + "     " + o[i] + "\n");
         }
 
-        output += "Mean: " + (t/10.0);
+        output += "Mean: " + Math.round(t*10/((double)s.size()))/10.0;
         return output;
     }
 }
