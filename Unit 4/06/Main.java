@@ -15,7 +15,7 @@ public class Main {
         }
         System.out.println();
 
-        for (int i = 0; i < (y - 2); i++) {
+        if (y > 2) {for (int i = 0; i < (y - 2); i++) {
             for (int j = 0; j < x; j++) {
                 if (j == 0 || ((j + 1) == x)) {
                     System.out.print(c);
@@ -24,10 +24,10 @@ public class Main {
                 }
             }
             System.out.println();
-        }
+        }}
 
-        for (int j = 0; j < x; j++) {
+        if (y > 1) {for (int j = 0; j < x; j++) {
             System.out.print(c);
-        }
+        }}
     }
 }
