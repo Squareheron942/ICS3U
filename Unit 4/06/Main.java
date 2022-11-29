@@ -10,9 +10,10 @@ public class Main {
         cin.close();
     }
     public static void printRectHollow(char c, int x, int y) {
-        for (int j = 0; j < x; j++) {
+        if (x > 0)
+        {if (y > 0) {for (int j = 0; j < x; j++) {
             System.out.print(c);
-        }
+        }}
         System.out.println();
 
         if (y > 2) {for (int i = 0; i < (y - 2); i++) {
@@ -28,6 +29,6 @@ public class Main {
 
         if (y > 1) {for (int j = 0; j < x; j++) {
             System.out.print(c);
-        }}
+        }}}
     }
 }
