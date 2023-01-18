@@ -1,5 +1,5 @@
 import java.util.*;
-class Main {
+public class Main {
     public static void main(String[] args) {
     //DO NOT ALTER THIS MAIN
         //collect user input
