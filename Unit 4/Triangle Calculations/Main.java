@@ -6,31 +6,34 @@ import java.util.Scanner;
 public class Main {
     static int[] sides = new int[3];
     static String cancel = Arrays.toString(new int[] {0, 0, 0});
+    static String sidesList;
+    static Scanner cin = new Scanner(System.in);
     public static void main(String[] args) {
-
-        Scanner cin = new Scanner(System.in);
 
         System.out.println("-------------------------\n|  Triangle Calculator  |\n-------------------------\n");
 
-        while(true) {
+        sides = getInput();
 
-            System.out.println("Enter the three sides of the triangle (on one line, separated by spaces):\n");
-
-            sides = Arrays.stream(cin.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
-
-            System.out.println();
-
-            String sidesList = Arrays.toString(sides);
-
-            // check for termination command
-            if (sidesList.equals(cancel)) {System.out.println(sidesList + " Program was terminated by user.");cin.close();return;}
-
+        while (!sidesList.equals(cancel)) {
             // check for invalid triangle
-            if (sides.length != 3) {System.out.println(sidesList + " Invalid: please enter three sides. (" + sides.length + " value" + (sides.length != 1 ? 's' : "") + " entered)");continue;}
-            if (!isTriangle(sides)) {System.out.println(sidesList + " Triangle cannot be formed.");continue;}
+            if (sides.length != 3) {System.out.println(sidesList + " Invalid: please enter three sides. (" + sides.length + " value" + (sides.length != 1 ? 's' : "") + " entered)");sides = getInput();continue;}
+            if (!isTriangle(sides)) {System.out.println(sidesList + " Triangle cannot be formed.");sides = getInput();continue;}
 
             output(sides);
+
+            sides = getInput();
         }
+
+        System.out.println(sidesList + " Program was terminated by user.");
+        cin.close();
+    }
+
+    static int[] getInput() {
+        System.out.println("Enter the three sides of the triangle (on one line, separated by spaces):\n");
+        int[] sides = Arrays.stream(cin.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
+        System.out.println();
+        sidesList = Arrays.toString(sides);
+        return sides;
     }
 
     static boolean isTriangle(int[] sides) {
@@ -144,7 +147,7 @@ public class Main {
 
         // fill each array with spaces
         Arrays.stream(arr).forEach(v -> Arrays.fill(v, ' '));
-        System.out.println("Vector2 positions:\n  A: " + A.toString() + "\n  B: " + B.toString() + "\n  C: " + C.toString() + "\n");
+        System.out.println("Point positions:\n  A: " + A.toString() + "\n  B: " + B.toString() + "\n  C: " + C.toString() + "\n");
 
         System.out.println("Diagram of triangle:");
 
