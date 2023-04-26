@@ -49,6 +49,6 @@ public class Main {
         do {
             Pixel[][] fbuf = Renderer.render(scene, cam);
             Renderer.draw(fbuf);
-        } while (false);
+        } while (true);
     }
 }
