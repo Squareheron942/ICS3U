@@ -58,17 +58,6 @@ public class Renderer {
         return fbuf;
     }
 
-    static void draw(Pixel[][] fbuf) {
-        for (int u = 0; u < fbuf.length; u++) {
-            for (int v = 0; v < fbuf[0].length; v++) {
-                try {
-                    img.setRGB(u, v, new java.awt.Color(fbuf[u][v].color.r, fbuf[u][v].color.g, fbuf[u][v].color.b).getRGB());
-                } catch (Exception e) {}
-            }
-        }
-        frame.repaint();
-    }
-
     public static Pixel[][] render(Scene scene, OrthogonalCamera cam) {
         // project to 2D
         GameObject[] objects = new GameObject[scene.children.size()];
