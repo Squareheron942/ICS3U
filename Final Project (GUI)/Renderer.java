@@ -9,7 +9,7 @@ public class Renderer {
     private static JFrame frame;
     private static JPanel renderPanel;
     private static BufferedImage img = new BufferedImage(600, 600, BufferedImage.TYPE_INT_RGB);
-    public static Pixel[][] render(Scene scene, Camera cam) {
+    public static Pixel[][] render(Scene scene, PerspectiveCamera cam) {
         // project to 2D
         GameObject[] objects = new GameObject[scene.children.size()];
         for (int i = 0; i < scene.children.size(); i++) {
@@ -69,11 +69,80 @@ public class Renderer {
         frame.repaint();
     }
 
-    private static Triangle project2D(Triangle tri, Camera cam) {
+    public static Pixel[][] render(Scene scene, OrthogonalCamera cam) {
+        // project to 2D
+        GameObject[] objects = new GameObject[scene.children.size()];
+        for (int i = 0; i < scene.children.size(); i++) {
+            Triangle[] tris = new Triangle[scene.children.get(i).mesh.tris.length];
+            for (int j = 0; j < tris.length; j++) {
+                tris[j] = project2D(scene.children.get(i).mesh.tris[j], cam);
+            }
+            GameObject object = new GameObject(new Mesh(tris), scene.children.get(i).mats);
+            objects[i] = object;
+        }
+
+        // rasterize into pixels
+        Pixel[][] fbuf = new Pixel[img.getWidth()][img.getHeight()];
+
+        for (Pixel[] row: fbuf) {
+            Arrays.fill(row, new Pixel());
+        }
+
+        for (int i = 0; i < objects.length; i++) {
+            for (int j = 0; j < objects[i].mesh.tris.length; j++) {
+                List<Vector2> a = findLine(objects[i].mesh.tris[j].vertices2D[0].position, objects[i].mesh.tris[j].vertices2D[1].position);
+                List<Vector2> b = findLine(objects[i].mesh.tris[j].vertices2D[1].position, objects[i].mesh.tris[j].vertices2D[2].position);
+                List<Vector2> c = findLine(objects[i].mesh.tris[j].vertices2D[2].position, objects[i].mesh.tris[j].vertices2D[0].position);
+
+                
+
+                for (int k = 0; k < a.size(); k++) {
+                    try {
+                        fbuf[(int)a.get(k).x + img.getWidth() >> 1][(int)a.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[0].color, objects[i].mesh.tris[j].vertices2D[1].color, k / (float)a.size()));
+                    } catch (Exception e) {System.out.println("A has a problem");}
+                }
+                for (int k = 0; k < b.size(); k++) {
+                    try {
+                        fbuf[(int)b.get(k).x + img.getWidth() >> 1][(int)b.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[1].color, objects[i].mesh.tris[j].vertices2D[2].color, k / (float)b.size()));
+                    } catch (Exception e) {System.out.println("B has a problem");}
+                }
+                for (int k = 0; k < c.size(); k++) {
+                    try {
+                        fbuf[(int)c.get(k).x + img.getWidth() >> 1][(int)c.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[2].color, objects[i].mesh.tris[j].vertices2D[0].color, k / (float)c.size()));
+                    } catch (Exception e) {
+                        System.out.println("C has a problem");
+                    }
+                }
+            }
+        }
+        return fbuf;
+    }
+
+    static void draw(Pixel[][] fbuf) {
+        for (int u = 0; u < fbuf.length; u++) {
+            for (int v = 0; v < fbuf[0].length; v++) {
+                try {
+                    img.setRGB(u, v, new java.awt.Color(fbuf[u][v].color.r, fbuf[u][v].color.g, fbuf[u][v].color.b).getRGB());
+                } catch (Exception e) {}
+            }
+        }
+        frame.repaint();
+    }
+
+    private static Triangle project2D(Triangle tri, PerspectiveCamera cam) {
         Vertex2D[] vertices = new Vertex2D[3];
         for (int i = 0; i < 3; i++) {
             float zratio = cam.focalLength / (tri.vertices[i].worldPos.z + cam.focalLength);
             vertices[i] = new Vertex2D(new Vector2(tri.vertices[i].worldPos.x * zratio, tri.vertices[i].worldPos.y * zratio), tri.vertices[i].color);
+        }
+
+        return new Triangle(vertices, tri.worldNormal);
+    }
+
+    private static Triangle project2D(Triangle tri, OrthogonalCamera cam) {
+        Vertex2D[] vertices = new Vertex2D[3];
+        for (int i = 0; i < 3; i++) {
+            vertices[i] = new Vertex2D(new Vector2(tri.vertices[i].worldPos.x / cam.size.x, tri.vertices[i].worldPos.y / cam.size.y), tri.vertices[i].color);
         }
 
         return new Triangle(vertices, tri.worldNormal);

@@ -38,11 +38,11 @@ public class Main {
                     }), 
                     new Material(new Color())));
 
-        Camera cam = new PerspectiveCamera(
+        PerspectiveCamera cam = new PerspectiveCamera(
             new Vector3(0, 0, 0), // position
             new Vector3(0, 0, 0), // rotation
             75,
-            20
+            200
         );
 
         Renderer.init(scene, cam);
