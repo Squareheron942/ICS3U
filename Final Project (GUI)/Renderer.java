@@ -188,9 +188,6 @@ public class Renderer {
                 @Override
                 protected void paintComponent(Graphics g) {
                     Graphics2D g2 = (Graphics2D)g;
-                    img.setRGB(67 + getWidth() >> 1, 67 + getHeight() >> 1, 0xff0000);
-                    img.setRGB(-67 + getWidth() >> 1, -67 + getHeight() >> 1, 0x00ff00);
-                    img.setRGB(-200 + getWidth() >> 1, 200 + getHeight() >> 1, 0x0000ff);
                     g2.drawImage(img, 0, 0, null);
                     img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
                 }
@@ -199,7 +196,7 @@ public class Renderer {
             pane.add(renderPanel, BorderLayout.CENTER);
             frame.setSize(600, 600);
             frame.setVisible(true);
-            frame.setResizable(false);
+            frame.setResizable(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } catch (Exception e) {
             return false;
