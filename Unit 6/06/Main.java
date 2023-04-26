@@ -101,3 +101,4 @@ class Fraction {
         System.out.println(this.num + "/" + this.den);
     }
 }
+
