@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.image.*;
+import javax.swing.event.*;
 
 public class Renderer {
     private static JFrame frame;
     private static JPanel renderPanel;
     private static BufferedImage img = new BufferedImage(600, 600, BufferedImage.TYPE_INT_RGB);
+    private static float[][] zbuf; 
     public static Pixel[][] render(Scene scene, PerspectiveCamera cam) {
         // project to 2D
         GameObject[] objects = new GameObject[scene.children.size()];
@@ -23,40 +25,69 @@ public class Renderer {
 
         // rasterize into pixels
         Pixel[][] fbuf = new Pixel[img.getWidth()][img.getHeight()];
+        zbuf = new float[img.getWidth()][img.getHeight()];
 
         for (Pixel[] row: fbuf) {
             Arrays.fill(row, new Pixel());
         }
 
-        for (int i = 0; i < objects.length; i++) {
-            for (int j = 0; j < objects[i].mesh.tris.length; j++) {
-                List<Vector2> a = findLine(objects[i].mesh.tris[j].vertices2D[0].position, objects[i].mesh.tris[j].vertices2D[1].position);
-                List<Vector2> b = findLine(objects[i].mesh.tris[j].vertices2D[1].position, objects[i].mesh.tris[j].vertices2D[2].position);
-                List<Vector2> c = findLine(objects[i].mesh.tris[j].vertices2D[2].position, objects[i].mesh.tris[j].vertices2D[0].position);
+        
 
-                
+        for (GameObject object : objects) {
+            for (Triangle t : object.mesh.tris) {
+                Vertex v1 = t.vertices[0];
+                Vertex v2 = t.vertices[1];
+                Vertex v3 = t.vertices[2];
 
-                for (int k = 0; k < a.size(); k++) {
-                    try {
-                        fbuf[(int)a.get(k).x + img.getWidth() >> 1][(int)a.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[0].color, objects[i].mesh.tris[j].vertices2D[1].color, k / (float)a.size()));
-                    } catch (Exception e) {System.out.println("A has a problem");}
-                }
-                for (int k = 0; k < b.size(); k++) {
-                    try {
-                        fbuf[(int)b.get(k).x + img.getWidth() >> 1][(int)b.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[1].color, objects[i].mesh.tris[j].vertices2D[2].color, k / (float)b.size()));
-                    } catch (Exception e) {System.out.println("B has a problem");}
-                }
-                for (int k = 0; k < c.size(); k++) {
-                    try {
-                        fbuf[(int)c.get(k).x + img.getWidth() >> 1][(int)c.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[2].color, objects[i].mesh.tris[j].vertices2D[0].color, k / (float)c.size()));
-                    } catch (Exception e) {
-                        System.out.println("C has a problem");
+                int minX = (int) Math.max(-img.getWidth(), Math.ceil(Math.min(v1.worldPos.x, Math.min(v2.worldPos.x, v3.worldPos.x))));
+                int maxX = (int) Math.min(img.getWidth() >> 1 - 1, Math.floor(Math.max(v1.worldPos.x, Math.max(v2.worldPos.x, v3.worldPos.x))));
+                int minY = (int) Math.max(-img.getHeight(), Math.ceil(Math.min(v1.worldPos.y, Math.min(v2.worldPos.y, v3.worldPos.y))));
+                int maxY = (int) Math.min(img.getHeight() >> 1 - 1, Math.floor(Math.max(v1.worldPos.y, Math.max(v2.worldPos.y, v3.worldPos.y))));
+
+                for (int y = minY; y <= maxY; y++) {
+                    for (int x = minX; x <= maxX; x++) {
+                        Vector2 p = new Vector2(x,y);
+                        // Judge once for each vertex
+                        boolean V1 = sameSide(v1.worldPos, v2.worldPos, v3.worldPos, p);
+                        boolean V2 = sameSide(v2.worldPos, v3.worldPos, v1.worldPos, p);
+                        boolean V3 = sameSide(v3.worldPos, v1.worldPos, v2.worldPos, p);
+
+                        if (V3 && V2 && V1) {
+                            try {
+                                fbuf[x + img.getWidth() >> 1][-y + img.getHeight() >> 1] = new Pixel(t.worldNormal, t.color);
+                            } catch (Exception e) {System.out.println("Raster Pixel out of range");}
+                        }
                     }
                 }
             }
         }
+
+        for (GameObject object : objects) {
+            for (Triangle t : object.mesh.tris) {
+                List<Vector2> a = findLine(t.vertices[0].worldPos, t.vertices[1].worldPos);
+                List<Vector2> b = findLine(t.vertices[1].worldPos, t.vertices[2].worldPos);
+                List<Vector2> c = findLine(t.vertices[2].worldPos, t.vertices[0].worldPos);
+
+                try {
+                    for (int k = 0; k < a.size(); k++) {
+                        fbuf[(int)a.get(k).x + img.getWidth() >> 1][(int)-a.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[0].color, t.vertices[1].color, k / (float)a.size()));
+                    }
+                } catch (Exception e) {} 
+                try {
+                    for (int k = 0; k < b.size(); k++) {                    
+                        fbuf[(int)b.get(k).x + img.getWidth() >> 1][(int)-b.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[1].color, t.vertices[2].color, k / (float)b.size()));
+                    }
+                } catch (Exception e) {} 
+                try {
+                    for (int k = 0; k < c.size(); k++) {
+                        fbuf[(int)c.get(k).x + img.getWidth() >> 1][(int)-c.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[2].color, t.vertices[0].color, k / (float)c.size()));
+                    }
+                } catch (Exception e) {} 
+            }
+        }
         return fbuf;
     }
+
 
     public static Pixel[][] render(Scene scene, OrthogonalCamera cam) {
         // project to 2D
@@ -77,31 +108,27 @@ public class Renderer {
             Arrays.fill(row, new Pixel());
         }
 
-        for (int i = 0; i < objects.length; i++) {
-            for (int j = 0; j < objects[i].mesh.tris.length; j++) {
-                List<Vector2> a = findLine(objects[i].mesh.tris[j].vertices2D[0].position, objects[i].mesh.tris[j].vertices2D[1].position);
-                List<Vector2> b = findLine(objects[i].mesh.tris[j].vertices2D[1].position, objects[i].mesh.tris[j].vertices2D[2].position);
-                List<Vector2> c = findLine(objects[i].mesh.tris[j].vertices2D[2].position, objects[i].mesh.tris[j].vertices2D[0].position);
+        for (GameObject object : objects) {
+            for (Triangle t : object.mesh.tris) {
+                List<Vector2> a = findLine(t.vertices[0].worldPos, t.vertices[1].worldPos);
+                List<Vector2> b = findLine(t.vertices[1].worldPos, t.vertices[2].worldPos);
+                List<Vector2> c = findLine(t.vertices[2].worldPos, t.vertices[0].worldPos);
 
-                
-
-                for (int k = 0; k < a.size(); k++) {
-                    try {
-                        fbuf[(int)a.get(k).x + img.getWidth() >> 1][(int)a.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[0].color, objects[i].mesh.tris[j].vertices2D[1].color, k / (float)a.size()));
-                    } catch (Exception e) {System.out.println("A has a problem");}
-                }
-                for (int k = 0; k < b.size(); k++) {
-                    try {
-                        fbuf[(int)b.get(k).x + img.getWidth() >> 1][(int)b.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[1].color, objects[i].mesh.tris[j].vertices2D[2].color, k / (float)b.size()));
-                    } catch (Exception e) {System.out.println("B has a problem");}
-                }
-                for (int k = 0; k < c.size(); k++) {
-                    try {
-                        fbuf[(int)c.get(k).x + img.getWidth() >> 1][(int)c.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(objects[i].mesh.tris[j].vertices2D[2].color, objects[i].mesh.tris[j].vertices2D[0].color, k / (float)c.size()));
-                    } catch (Exception e) {
-                        System.out.println("C has a problem");
+                try {
+                    for (int k = 0; k < a.size(); k++) {
+                        fbuf[(int)a.get(k).x + img.getWidth() >> 1][(int)-a.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[0].color, t.vertices[1].color, k / (float)a.size()));
                     }
-                }
+                } catch (Exception e) {} 
+                try {
+                    for (int k = 0; k < b.size(); k++) {                    
+                        fbuf[(int)b.get(k).x + img.getWidth() >> 1][(int)-b.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[1].color, t.vertices[2].color, k / (float)b.size()));
+                    }
+                } catch (Exception e) {} 
+                try {
+                    for (int k = 0; k < c.size(); k++) {
+                        fbuf[(int)c.get(k).x + img.getWidth() >> 1][(int)-c.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[2].color, t.vertices[0].color, k / (float)c.size()));
+                    }
+                } catch (Exception e) {} 
             }
         }
         return fbuf;
@@ -119,30 +146,33 @@ public class Renderer {
     }
 
     private static Triangle project2D(Triangle tri, PerspectiveCamera cam) {
-        Vertex2D[] vertices = new Vertex2D[3];
+        Vertex[] vertices = new Vertex[3];
+        float focalLength = (img.getWidth() >> 1) * LUTs.cot((int)cam.fov() >> 1); // f = (width/2) * ctg(HFOV/2)
         for (int i = 0; i < 3; i++) {
-            float zratio = cam.focalLength / (tri.vertices[i].worldPos.z + cam.focalLength);
-            vertices[i] = new Vertex2D(new Vector2(tri.vertices[i].worldPos.x * zratio, tri.vertices[i].worldPos.y * zratio), tri.vertices[i].color);
+            float zratio = focalLength / (-tri.vertices[i].worldPos.z + focalLength);
+            vertices[i] = new Vertex(new Vector3(tri.vertices[i].worldPos.x * zratio, tri.vertices[i].worldPos.y * zratio, tri.vertices[i].worldPos.z), tri.vertices[i].color);
         }
 
-        return new Triangle(vertices, tri.worldNormal);
+        return new Triangle(vertices, tri.color);
     }
 
     private static Triangle project2D(Triangle tri, OrthogonalCamera cam) {
-        Vertex2D[] vertices = new Vertex2D[3];
+        Vertex[] vertices = new Vertex[3];
         for (int i = 0; i < 3; i++) {
-            vertices[i] = new Vertex2D(new Vector2(tri.vertices[i].worldPos.x / cam.size.x, tri.vertices[i].worldPos.y / cam.size.y), tri.vertices[i].color);
+            vertices[i] = new Vertex(new Vector3(tri.vertices[i].worldPos.x / cam.size.x, tri.vertices[i].worldPos.y / cam.size.y, tri.vertices[i].worldPos.z), tri.vertices[i].color);
         }
 
-        return new Triangle(vertices, tri.worldNormal);
+        return new Triangle(vertices, tri.color);
     }
 
-    private static List<Vector2> findLine(Vector2 p1, Vector2 p2)
+    private static List<Vector2> findLine(Vector3 p1, Vector3 p2)
     {
         // bresenham's line drawing algorithm, reused from triangle assignment
         List<Vector2> line = new ArrayList<Vector2>();
 
-        Vector2 A = new Vector2(p1.x, p1.y), B = new Vector2(p2.x, p2.y);
+        long maxSize = Math.round(Math.sqrt(2) * Math.sqrt(frame.getHeight() * frame.getHeight() + frame.getWidth() * frame.getWidth()));
+
+        Vector2 A = new Vector2(p1.x, p1.y), B = new Vector2(p2.x, p2.y); // copy without weird reference bugginess
  
         int dx = (int)Math.round(Math.abs(B.x - A.x));
         int dy = (int)Math.round(Math.abs(B.y - A.y));
@@ -162,7 +192,7 @@ public class Renderer {
         {
             line.add(new Vector2(A.x, A.y));
  
-            if (Math.round(A.x) == Math.round(B.x) && Math.round(A.y) == Math.round(B.y)) break; // if positions are the same stop
+            if (Math.abs(B.x - A.x) < 2 && Math.abs(B.y - A.y) < 2 || line.size() > maxSize) break; // if positions are the same stop
  
             e2 = 2 * err;
             if (e2 > -dy) {
@@ -194,6 +224,19 @@ public class Renderer {
             };
 
             pane.add(renderPanel, BorderLayout.CENTER);
+
+            JSlider xpos = new JSlider(-300, 300, 0);
+            xpos.addChangeListener(new xListener());
+            pane.add(xpos, BorderLayout.PAGE_START);
+
+            JSlider ypos = new JSlider(-300, 300, 0);
+            ypos.addChangeListener(new yListener());
+            pane.add(ypos, BorderLayout.LINE_START);
+
+            JSlider zpos = new JSlider(-300, 300, 0);
+            zpos.addChangeListener(new zListener());
+            pane.add(zpos, BorderLayout.PAGE_END);
+
             frame.setSize(600, 600);
             frame.setVisible(true);
             frame.setResizable(true);
@@ -203,5 +246,50 @@ public class Renderer {
         }
         return true;
     }
+    
+    private static boolean sameSide(Vector3 a, Vector3 b, Vector3 c, Vector2 s) {
 
+        int as_x = (int)(s.x - a.x);
+        int as_y = (int)(s.y - a.y);
+
+        boolean s_ab = (b.x - a.x) * as_y - (b.y - a.y) * as_x > 0;
+
+        if ((c.x - a.x) * as_y - (c.y - a.y) * as_x > 0 == s_ab) 
+            return false;
+        if ((c.x - b.x) * (s.y - b.y) - (c.y - b.y)*(s.x - b.x) > 0 != s_ab) 
+            return false;
+        return true;
+
+        // return ((B.x - A.x) * (B.y - A.y) - (C.x - A.x) * (C.y - A.y)) * ((B.x - A.x) * (p.y - A.y) - (p.x - A.x) * (B.y - A.y)) >= 0;
+    }
+}
+
+class xListener implements ChangeListener {
+    public void stateChanged(ChangeEvent e) {
+        JSlider source = (JSlider)e.getSource();
+        int x = (int)source.getValue();
+        GameObject cube = (Main.scene.children.get(0));
+        cube.setPosition(new Vector3(x, Main.scene.children.get(0).position().y, Main.scene.children.get(0).position().z));
+        Main.scene.children.set(0, cube);
+    }
+}
+
+class yListener implements ChangeListener {
+    public void stateChanged(ChangeEvent e) {
+        JSlider source = (JSlider)e.getSource();
+        int y = (int)source.getValue();
+        GameObject cube = (Main.scene.children.get(0));
+        cube.setPosition(new Vector3(Main.scene.children.get(0).position().x, y, Main.scene.children.get(0).position().z));
+        Main.scene.children.set(0, cube);
+    }
+}
+
+class zListener implements ChangeListener {
+    public void stateChanged(ChangeEvent e) {
+        JSlider source = (JSlider)e.getSource();
+        int z = (int)source.getValue();
+        GameObject cube = (Main.scene.children.get(0));
+        cube.setPosition(new Vector3(Main.scene.children.get(0).position().x, Main.scene.children.get(0).position().y, z));
+        Main.scene.children.set(0, cube);
+    }
 }

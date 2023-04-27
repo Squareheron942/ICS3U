@@ -1,15 +1,23 @@
 public class Color {
-    float r, g, b; /*[0, 1] */
+    float r, g, b, a; /*[0, 1] */
     Color() {
         r = 0;
         g = 0;
         b = 0;
+        a = 1;
     }
 
     Color(float r, float g, float b) {
         this.r = r;
         this.g = g;
-        this.b = b;;
+        this.b = b;
+    }
+
+    Color(float r, float g, float b, float a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
     }
 
     static Color lerp(Color a, Color b, float ratio) {
