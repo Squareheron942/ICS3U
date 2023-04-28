@@ -7,6 +7,7 @@ import java.awt.image.*;
 import javax.swing.event.*;
 
 public class Renderer {
+    public static int renderMode = 1;
     private static JFrame frame;
     private static JPanel renderPanel;
     private static BufferedImage img = new BufferedImage(600, 600, BufferedImage.TYPE_INT_RGB);
@@ -60,7 +61,7 @@ public class Renderer {
                                 float zVal = 1 - ((cam.nearClip - 1f / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (float)(cam.farClip));
 
                                 if (zbuf[x + img.getWidth() >> 1][y + img.getHeight() >> 1] < zVal && zVal <= 1 && zVal >= 0) {
-                                    fbuf[x + img.getWidth() >> 1][-y + img.getHeight() >> 1] = new Pixel(t.worldNormal, t.color);
+                                    fbuf[x + img.getWidth() >> 1][-y + img.getHeight() >> 1] = new Pixel(t.worldNormal, renderMode == 0 ? t.color : renderMode == 1 ? new Color(zVal, zVal, zVal) : new Color(bary.y, bary.y, bary.z));
                                     zbuf[x + img.getWidth() >> 1][y + img.getHeight() >> 1] = zVal;
                                 }
                             } catch (Exception e) {System.out.println("Raster Pixel out of range");}
