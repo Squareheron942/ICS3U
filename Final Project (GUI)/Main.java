@@ -17,30 +17,30 @@ public class Main {
                     new Triangle[] {
                         new Triangle(
                             new Vertex[] {
-                                new Vertex(new Vector3(100, 100, 100), new Color(1, 0, 0)),
-                                new Vertex(new Vector3(-100, -100, 100), new Color(0, 0, 1)),
-                                new Vertex(new Vector3(-100, 100, -100), new Color(1, 1, 1))
+                                new Vertex(new Vector3(100, 100, 100 - 200), new Color(1, 0, 0)),
+                                new Vertex(new Vector3(-100, -100, 100 - 200), new Color(0, 0, 1)),
+                                new Vertex(new Vector3(-100, 100, -100 - 200), new Color(1, 1, 1))
                             }
                         ),
                         new Triangle(
                             new Vertex[] {
-                                new Vertex(new Vector3(100, 100, 100), new Color(1, 0, 0)),
-                                new Vertex(new Vector3(-100, -100, 100), new Color(0, 0, 1)),
-                                new Vertex(new Vector3(100, -100, -100), new Color(0, 0, 1))
+                                new Vertex(new Vector3(100, 100, 100 - 200), new Color(1, 0, 0)),
+                                new Vertex(new Vector3(-100, -100, 100 - 200), new Color(0, 0, 1)),
+                                new Vertex(new Vector3(100, -100, -100 - 200), new Color(0, 0, 1))
                             }
                         ),
                         new Triangle(
                             new Vertex[] {
-                                new Vertex(new Vector3(-100, 100, -100), new Color(1, 1, 1)),
-                                new Vertex(new Vector3(100, -100, -100), new Color(0, 1, 0)),
-                                new Vertex(new Vector3(100, 100, 100), new Color(1, 0, 0))
+                                new Vertex(new Vector3(-100, 100, -100 - 200), new Color(1, 1, 1)),
+                                new Vertex(new Vector3(100, -100, -100 - 200), new Color(0, 1, 0)),
+                                new Vertex(new Vector3(100, 100, 100 - 200), new Color(1, 0, 0))
                             }
                         ),
                         new Triangle(
                             new Vertex[] {
-                                new Vertex(new Vector3(-100, 100, -100), new Color(1, 1, 1)),
-                                new Vertex(new Vector3(100, -100, -100), new Color(0, 1, 0)),
-                                new Vertex(new Vector3(-100, -100, 100), new Color(0, 0, 1))
+                                new Vertex(new Vector3(-100, 100, -100 - 200), new Color(1, 1, 1)),
+                                new Vertex(new Vector3(100, -100, -100 - 200), new Color(0, 1, 0)),
+                                new Vertex(new Vector3(-100, -100, 100 - 200), new Color(0, 0, 1))
                             }
                         )
                     }), 
@@ -51,7 +51,7 @@ public class Main {
             new Vector3(0, 0, 0), // rotation
             75,
             1,
-            1000
+            300
         );
 
         // for (int i = 1; i < 180; i++) {

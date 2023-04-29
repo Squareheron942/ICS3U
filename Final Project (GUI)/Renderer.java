@@ -7,7 +7,7 @@ import java.awt.image.*;
 import javax.swing.event.*;
 
 public class Renderer {
-    public static int renderMode = 1;
+    public static int renderMode = 0;
     private static JFrame frame;
     private static JPanel renderPanel;
     private static BufferedImage img = new BufferedImage(600, 600, BufferedImage.TYPE_INT_RGB);
@@ -58,13 +58,13 @@ public class Renderer {
                         if (V3 && V2 && V1) {
                             try {
                                 Vector3 bary = bary(v1.worldPos, v2.worldPos, v3.worldPos, p);
-                                float zVal = 1 - ((cam.nearClip - 1f / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (float)(cam.farClip));
+                                float zVal = 1 - ((cam.nearClip - 1 / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (float)(cam.farClip));
 
                                 if (zbuf[x + img.getWidth() >> 1][y + img.getHeight() >> 1] < zVal && zVal <= 1 && zVal >= 0) {
-                                    fbuf[x + img.getWidth() >> 1][-y + img.getHeight() >> 1] = new Pixel(t.worldNormal, renderMode == 0 ? t.color : renderMode == 1 ? new Color(zVal, zVal, zVal) : new Color(bary.y, bary.y, bary.z));
+                                    fbuf[x + img.getWidth() >> 1][-y + img.getHeight() >> 1] = new Pixel(t.worldNormal, renderMode == 0 ? t.color : renderMode == 1 ? new Color(zVal, zVal, zVal) : new Color(bary.x, bary.y, bary.z));
                                     zbuf[x + img.getWidth() >> 1][y + img.getHeight() >> 1] = zVal;
                                 }
-                            } catch (Exception e) {System.out.println("Raster Pixel out of range");}
+                            } catch (Exception e) {}
                         }
                     }
                 }
