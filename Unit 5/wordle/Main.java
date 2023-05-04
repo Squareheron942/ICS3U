@@ -158,7 +158,9 @@ public class Main {
             CYAN + "Wordle Guy" + RESET + " : 800 pts\n" + 
             MAGENTA + "Wordle Mid" + RESET + " : 600 pts\n" + 
             "Wordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET + " : 0 pts\n" + 
-            "\nPoints:\n" + 
+            RED + "???????" + RESET + " : ?????? pts\n" +
+            "\n" + 
+            "Points:\n" + 
             "1 guess: " + GREEN + "+97 pts" + RESET + "\n" + 
             "2 guesses: " + LIME + "+83 pts" + RESET + "\n" + 
             "3 guesses: " + LIME + "+71 pts" + RESET + "\n" + 
