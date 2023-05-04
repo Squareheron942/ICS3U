@@ -57,7 +57,6 @@ public class Main {
 
         playedBeforePrompt();
 
-        System.out.println("        -----------------------\n        |       wordle        |\n        -----------------------\n\n");
         String[] winMessages = {
             "Genius",
             "Magnificent",
@@ -77,6 +76,8 @@ public class Main {
         };
 
         do {
+            System.out.println("        -----------------------\n        |       wordle        |\n        -----------------------\n\n");
+
             // get 6 guesses
             for (int i = 0; i < 6; i++) {
                 lineNum = i;
@@ -90,6 +91,7 @@ public class Main {
                 System.out.println(winMessages[lineNum]);
                 points += winPoints[lineNum];
                 System.out.println("Your points: " + points);
+                won = false;
             } else {
                 System.out.println("You Lost!");
                 points += winPoints[6];
@@ -97,7 +99,15 @@ public class Main {
             }
         } while (!canceled());
 
-        System.out.println("\nThanks for playing! Your achieved rank was: " + (points < 0 ? "...I have no words" :  points < 600 ? "Wordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET : points < 800 ? MAGENTA + "Wordle Mid" + RESET : points < 1000 ? CYAN + "Wordle Guy" + RESET : GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + "\n\nRanks:\n" + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + "  " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + "  " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET) + " with " + points + " pts.\n\nShare this with all your friends to totally wordle them!");
+        System.out.println(
+            "\nThanks for playing! Your achieved rank was: " + (
+            points < 0 ? "...I have no words (ur so garbage)..." :  
+            points < 600 ? "Wordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET : 
+            points < 800 ? MAGENTA + "Wordle Mid" + RESET : 
+            points < 1000 ? CYAN + "Wordle Guy" + RESET : 
+            GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y") + 
+            " with " + points + " pts.\n\nShare this with all your friends to totally wordle them!"
+        );
     }
 
     static boolean canceled() {
