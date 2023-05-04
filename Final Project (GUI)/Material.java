@@ -1,6 +1,6 @@
 public class Material {
-    Color color;
-    Material(Color color) {
-        this.color = color;
+    Shader shader;
+    Material(MaterialProperty[] props, Shader shader) {
+        this.shader = shader;
     }
 }

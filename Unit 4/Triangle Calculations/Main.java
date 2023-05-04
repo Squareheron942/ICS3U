@@ -198,8 +198,12 @@ public class Main {
         return new Vector2[] {A, B, C};
     }
 
-    static List<Vector2> findLine(Vector2 A, Vector2 B, char c)
+    static List<Vector2> findLine(Vector2 v1, Vector2 v2, char c)
     {
+
+        Vector2 A = new Vector2(v1.x, v1.y, v1.character);
+        Vector2 B = new Vector2(v2.x, v2.y, v2.character);
+
         // bresenham's line drawing algorithm
         List<Vector2> line = new ArrayList<Vector2>();
  

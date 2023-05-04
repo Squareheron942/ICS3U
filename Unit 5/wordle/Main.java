@@ -5,14 +5,18 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 public class Main {
     // ANSI colour codes
-    static String WHITE = "\u001B[37m";
+    static String WHITE = "\u001B[97m";
+    static String RED = "\u001B[31m";
     static String GREEN = "\u001B[32m";
     static String YELLOW = "\u001B[33m";
+    static String BLUE = "\u001B[34m";
+    static String MAGENTA = "\u001B[35m";
+    static String CYAN = "\u001B[36m";
+    static String LIME = "\u001B[92m";
     static String GREEN_BG = "\u001B[42m";
     static String YELLOW_BG = "\u001B[43m";
     static String GREY_BG = "\u001B[100m";
@@ -100,7 +104,7 @@ public class Main {
     }
 
     static void tutorial() {
-        System.out.println("How to play:\n\nGuess the word in 6 tries.\nType to enter a guess.\nEach guess must be a valid 5-letter word.\nThe color of the character will indicate how close you are:\n - A green letter means it is in the word and in the right spot\n - A yellow letter means it is in the word but in the wrong spot\n - A grey letter means it is not in the word");
+        System.out.println("How to play:\n\nGuess the word in 6 tries.\nType to enter a guess.\nEach guess must be a valid 5-letter word.\nThe color of the character will indicate how close you are:\n - A " + GREEN_BG + "green" + RESET + " letter means it is in the word and in the right spot\n - A " + YELLOW_BG + "yellow" + RESET + " letter means it is in the word but in the wrong spot\n - A " + GREY_BG + "grey" + RESET + " letter means it is not in the word.\n\n\nWordle Ranking System:\n    - In this version, you get points every game you play\n    - Get more points to achieve the ultimate rank of " + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + "\n\nRanks:\n" + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + "  " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + "  " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + " : 1000 pts\n" + CYAN + "Wordle Guy" + RESET + "\n" + MAGENTA + "Wordle Mid" + RESET + "\nWordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET + "\n\nPoints:\n1 guess: " + GREEN + "+97 pts" + RESET + "\n2 guesses: " + LIME + "+83 pts" + RESET + "\n3 guesses: " + LIME + "+71 pts" + RESET + "\n4 guesses: " + YELLOW + "+59 pts" + RESET + "\n5 guesses: +37 pts\n6 guesses: +3 pts\nfail: " + RED + "-31 pts" + RESET + "\n" );
     }
 
     static void del_line() {
@@ -164,12 +168,12 @@ public class Main {
 // Type to enter a guess.
 // Each guess must be a valid 5-letter word.
 // The color of the character will indicate how close you are:
-// - A green letter means it is in the word and in the right spot
-// - A yellow letter means it is in the word but in the wrong spot
+// - A /*green*/ letter means it is in the word and in the right spot
+// - A /*yellow*/ letter means it is in the word but in the wrong spot
 // - A grey letter means it is not in the word
 
 
-
+// 
 
 
 

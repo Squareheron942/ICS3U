@@ -28,10 +28,7 @@ public class Renderer {
         Pixel[][] fbuf = new Pixel[img.getWidth()][img.getHeight()];
         zbuf = new float[img.getWidth()][img.getHeight()];
 
-        for (Pixel[] row: fbuf) {
-            Arrays.fill(row, new Pixel());
-        }
-
+        for (Pixel[] row: fbuf) Arrays.fill(row, new Pixel());
         for (float[] row : zbuf) Arrays.fill(row, 0.0f);
 
         
