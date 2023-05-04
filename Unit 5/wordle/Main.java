@@ -35,6 +35,7 @@ public class Main {
     static boolean sus = false;
 
     public static void main(String[] args) {
+        int points = 0;
         // read in text from valid guesses text file
         try {
             File file = new File("valid.txt");
@@ -65,21 +66,43 @@ public class Main {
             "Great",
             "Phew"
         };
+        int[] winPoints = {
+            97,
+            83,
+            71,
+            59,
+            37,
+            3,
+            -31
+        };
 
-        // get 6 guesses
-        for (int i = 0; i < 6; i++) {
-            lineNum = i;
-            doLine();
-            if (won) break;
-            if (sus) return;
-        }
+        do {
+            // get 6 guesses
+            for (int i = 0; i < 6; i++) {
+                lineNum = i;
+                doLine();
+                if (won) break;
+                if (sus) return;
+            }
 
-        // if after all 6 guesses still not yet won then lose
-        if (won) {
-            System.out.println(winMessages[lineNum]);
-        } else {
-            System.out.println("You Lost!");
-        }
+            // if after all 6 guesses still not yet won then lose
+            if (won) {
+                System.out.println(winMessages[lineNum]);
+                points += winPoints[lineNum];
+                System.out.println("Your points: " + points);
+            } else {
+                System.out.println("You Lost!");
+                points += winPoints[6];
+                System.out.println("Your points: " + points);
+            }
+        } while (!canceled());
+
+        System.out.println("\nThanks for playing! Your achieved rank was: " + (points < 0 ? "...I have no words" :  points < 600 ? "Wordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET : points < 800 ? MAGENTA + "Wordle Mid" + RESET : points < 1000 ? CYAN + "Wordle Guy" + RESET : GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + "\n\nRanks:\n" + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + "  " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + "  " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET) + " with " + points + " pts.\n\nShare this with all your friends to totally wordle them!");
+    }
+
+    static boolean canceled() {
+        System.out.println("\nDo you wish to play again? (y/n)");
+        return cin.nextLine().toLowerCase().charAt(0) != 'y';
     }
 
     static String genWords() {
@@ -104,7 +127,7 @@ public class Main {
     }
 
     static void tutorial() {
-        System.out.println("How to play:\n\nGuess the word in 6 tries.\nType to enter a guess.\nEach guess must be a valid 5-letter word.\nThe color of the character will indicate how close you are:\n - A " + GREEN_BG + "green" + RESET + " letter means it is in the word and in the right spot\n - A " + YELLOW_BG + "yellow" + RESET + " letter means it is in the word but in the wrong spot\n - A " + GREY_BG + "grey" + RESET + " letter means it is not in the word.\n\n\nWordle Ranking System:\n    - In this version, you get points every game you play\n    - Get more points to achieve the ultimate rank of " + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + "\n\nRanks:\n" + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + "  " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + "  " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + " : 1000 pts\n" + CYAN + "Wordle Guy" + RESET + "\n" + MAGENTA + "Wordle Mid" + RESET + "\nWordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET + "\n\nPoints:\n1 guess: " + GREEN + "+97 pts" + RESET + "\n2 guesses: " + LIME + "+83 pts" + RESET + "\n3 guesses: " + LIME + "+71 pts" + RESET + "\n4 guesses: " + YELLOW + "+59 pts" + RESET + "\n5 guesses: +37 pts\n6 guesses: +3 pts\nfail: " + RED + "-31 pts" + RESET + "\n" );
+        System.out.println("How to play:\n\nGuess the word in 6 tries.\nType to enter a guess.\nEach guess must be a valid 5-letter word.\nThe color of the character will indicate how close you are:\n - A " + GREEN_BG + "green" + RESET + " letter means it is in the word and in the right spot\n - A " + YELLOW_BG + "yellow" + RESET + " letter means it is in the word but in the wrong spot\n - A " + GREY_BG + "grey" + RESET + " letter means it is not in the word.\n\n\nWordle Ranking System:\n    - In this version, you get points every game you play\n    - Get more points to achieve the ultimate rank of " + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + "\n\nRanks:\n" + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + "  " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + "  " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + " : 1000 pts\n" + CYAN + "Wordle Guy" + RESET + " : 800 pts\n" + MAGENTA + "Wordle Mid" + RESET + " : 600 pts\nWordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET + " : 0 pts\n\nPoints:\n1 guess: " + GREEN + "+97 pts" + RESET + "\n2 guesses: " + LIME + "+83 pts" + RESET + "\n3 guesses: " + LIME + "+71 pts" + RESET + "\n4 guesses: " + YELLOW + "+59 pts" + RESET + "\n5 guesses: +37 pts\n6 guesses: +3 pts\nfail: " + RED + "-31 pts" + RESET + "\n" );
     }
 
     static void del_line() {
