@@ -137,7 +137,36 @@ public class Main {
     }
 
     static void tutorial() {
-        System.out.println("How to play:\n\nGuess the word in 6 tries.\nType to enter a guess.\nEach guess must be a valid 5-letter word.\nThe color of the character will indicate how close you are:\n - A " + GREEN_BG + "green" + RESET + " letter means it is in the word and in the right spot\n - A " + YELLOW_BG + "yellow" + RESET + " letter means it is in the word but in the wrong spot\n - A " + GREY_BG + "grey" + RESET + " letter means it is not in the word.\n\n\nWordle Ranking System:\n    - In this version, you get points every game you play\n    - Get more points to achieve the ultimate rank of " + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + "\n\nRanks:\n" + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + "  " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + "  " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + " : 1000 pts\n" + CYAN + "Wordle Guy" + RESET + " : 800 pts\n" + MAGENTA + "Wordle Mid" + RESET + " : 600 pts\nWordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET + " : 0 pts\n\nPoints:\n1 guess: " + GREEN + "+97 pts" + RESET + "\n2 guesses: " + LIME + "+83 pts" + RESET + "\n3 guesses: " + LIME + "+71 pts" + RESET + "\n4 guesses: " + YELLOW + "+59 pts" + RESET + "\n5 guesses: +37 pts\n6 guesses: +3 pts\nfail: " + RED + "-31 pts" + RESET + "\n" );
+        System.out.println(
+            "How to play:\n" + 
+            "\n" +
+            "Guess the word in 6 tries.\n" + 
+            "Type to enter a guess.\n" + 
+            "Each guess must be a valid 5-letter word.\n" + 
+            "The color of the character will indicate how close you are:\n" + 
+            " - A " + GREEN_BG + "green" + RESET + " letter means it is in the word and in the right spot\n" + 
+            " - A " + YELLOW_BG + "yellow" + RESET + " letter means it is in the word but in the wrong spot\n" + 
+            " - A " + GREY_BG + "grey" + RESET + " letter means it is not in the word.\n" + 
+            "\n" + 
+            "\n" + 
+            "Wordle Ranking System:\n" + 
+            "    - In this version, you get points every game you play\n" + 
+            "    - Get more points to achieve the ultimate rank of " + GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + " " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + " " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + "\n" +
+            "\n" + 
+            "Ranks:\n" + 
+            GREEN + "W" + YELLOW + "o" + RED + "r" + BLUE + "d" + GREEN + "l" + YELLOW + "e" + RESET + "  " + RED + "c" + BLUE + "o" + GREEN + "o" + YELLOW + "l" + RESET + "  " + RED + "g" + BLUE + "u" + GREEN + "y" + RESET + " : 1000 pts\n" + 
+            CYAN + "Wordle Guy" + RESET + " : 800 pts\n" + 
+            MAGENTA + "Wordle Mid" + RESET + " : 600 pts\n" + 
+            "Wordle " + GREY_BG + "Tra" + YELLOW_BG + "s" + GREY_BG + "h" + RESET + " : 0 pts\n" + 
+            "\nPoints:\n" + 
+            "1 guess: " + GREEN + "+97 pts" + RESET + "\n" + 
+            "2 guesses: " + LIME + "+83 pts" + RESET + "\n" + 
+            "3 guesses: " + LIME + "+71 pts" + RESET + "\n" + 
+            "4 guesses: " + YELLOW + "+59 pts" + RESET + "\n" + 
+            "5 guesses: +37 pts\n" + 
+            "6 guesses: +3 pts\n" + 
+            "fail: " + RED + "-31 pts" + RESET + "\n" 
+        );
     }
 
     static void del_line() {
