@@ -74,6 +74,15 @@ public class Main {
         return dSides < 0 ? 0 : dSides == 0 ? 1 : 2;
     }
 
+    static double[] circleRadii(int[] sides) {
+        int a = sides[0], b = sides[1], c = sides[2];
+        double s = perim(sides) / 2.0;
+        double circum = (a * b * c) / Math.sqrt((a + b + c) * (b + c - a) * (a - b + c) * (a + b - c));
+        double inscr = Math.sqrt((s - a) * (s - b) * (s - c) / s);
+        double ninep = circum / 2f;
+        return new double[] {circum, inscr, ninep};
+    }
+
     static double[] calcAngles(int[] sides) {
         // used to convert radians to degrees
         double convertF = 180 / Math.PI;
@@ -122,6 +131,11 @@ public class Main {
         System.out.println();
         System.out.println("perimeter: " + perim(sides));
         System.out.println("area: " + area(sides));
+        System.out.println();
+        System.out.println("radius of circumscribed circle: " + circleRadii(sides)[0]);
+        System.out.println("radius of inscribed circle: " + circleRadii(sides)[1]);
+        System.out.println("radius of nine-point circle: " + circleRadii(sides)[2]);
+        System.out.println();
         drawTriangle(sides);
         System.out.println();
     }
