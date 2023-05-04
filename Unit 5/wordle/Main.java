@@ -1,3 +1,6 @@
+
+
+
 import java.util.Scanner;
 import java.util.Random;
 import java.util.Arrays;
@@ -6,7 +9,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
-
 public class Main {
     // ANSI colour codes
     static String WHITE = "\u001B[97m";
@@ -36,7 +38,7 @@ public class Main {
 
     public static void main(String[] args) {
         int points = 0;
-        // read in text from valid guesses text file
+        // read in text from valid words text file
         try {
             File file = new File("valid.txt");
             FileReader fr = new FileReader(file);
@@ -55,6 +57,7 @@ public class Main {
 
         System.out.println("\033[H\033[2J" + "Welcome to my Wordle Program!");
 
+        // ask if the user has played before
         playedBeforePrompt();
 
         String[] winMessages = {
@@ -75,6 +78,7 @@ public class Main {
             -31
         };
 
+        // loop game
         do {
             System.out.println("        -----------------------\n        |       wordle        |\n        -----------------------\n\n");
 
@@ -97,7 +101,7 @@ public class Main {
                 points += winPoints[6];
                 System.out.println("Your points: " + points);
             }
-        } while (!canceled());
+        } while (!canceled()); // only loop if the user wants to
 
         System.out.println(
             "\nThanks for playing! Your achieved rank was: " + (
@@ -115,6 +119,7 @@ public class Main {
         return cin.nextLine().toLowerCase().charAt(0) != 'y';
     }
 
+    // pick random word out of all of the valid answers (different, smaller list) that is contained in the Words class
     static String genWords() {
         Random rand = new Random();
         return Words.answersList[rand.nextInt(Words.answersList.length)];
@@ -136,6 +141,7 @@ public class Main {
         }
     }
 
+    // give rules for the game
     static void tutorial() {
         System.out.println(
             "How to play:\n" + 
@@ -171,13 +177,15 @@ public class Main {
         );
     }
 
+    // removes the previous inputted line to make the formatting nicer
     static void del_line() {
         System.out.print(String.format("\033[%dA",1)); // Move up cursor
         System.out.print("\033[2K"); // Erase line content
     }
 
+    // everything that happens every time a player inputs a word
     static void doLine() {
-        String line = cin.nextLine().toUpperCase();
+        String line = cin.nextLine().toUpperCase(); // get input
         // if sus
         if (Arrays.asList(Words.sussers).contains(line.toLowerCase())) {
             Words.sussy();
@@ -192,22 +200,29 @@ public class Main {
             line = cin.nextLine().toUpperCase();
         }
 
+        // remove the inputted word from view
         del_line();
 
         // compare entered word to correct word, if the same then win
         if (ans.toUpperCase().equals(line)) won = true;
 
-        draw_line(line);
+        draw_line(line); // display the result of the input
     }
 
     // draws a new line on the table of answers, with colour
     static void draw_line(String line) {
         if (lineNum == 0) System.out.println("         |---|---|---|---|---|");
         System.out.print("         ");
+        // iterate through each character of the word, and determine whether
         for (int i = 0; i < 5; i++) {
             if (ans.toUpperCase().charAt(i) == line.charAt(i)) {
                 System.out.print("| " + GREEN_BG + line.charAt(i) + RESET + " ");
-            } else if (ans.toUpperCase().indexOf(line.charAt(i)) >= 0) { // there is a mistake here but it is also present in wordle so I would consider it fine
+            } else if (ans.toUpperCase().indexOf(line.charAt(i)) >= 0) { 
+                // there is a mistake here but it is also present in wordle so I would consider it fine, 
+                // basically what should happen is that there are only yellow characters if there is another letter in the word
+                // for example with "feels" if someone guessed 'e' at the second spot, 3rd spot and 5th spot, the first two 'e' would be green 
+                // and the last one grey, because they guessed 3 'e' but there are only 2. What actually happens is that the third one will
+                // be yellow
                 System.out.print("| " + YELLOW_BG + line.charAt(i) + RESET + " ");
             } else {
                 System.out.print("| " + GREY_BG + line.charAt(i) + RESET + " ");
@@ -218,6 +233,7 @@ public class Main {
         System.out.println("         |---|---|---|---|---|");
     }
 
+    // returns whether all of the characters in a word are letters
     static boolean isAlpha(String line) {
         for (int i = 0; i < line.length(); i++) if (!Character.isLetter(line.charAt(i))) return false;
         return true;
