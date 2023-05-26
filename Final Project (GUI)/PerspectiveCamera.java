@@ -10,4 +10,5 @@ public class PerspectiveCamera extends Camera {
     }
 
     public float fov() { return fov; }
+    public void setFov(float fov) { this.fov = Math.max(1, Math.min(179, fov)); }
 }

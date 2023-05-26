@@ -56,17 +56,17 @@ public class Cube extends GameObject {
                         new Color(0, 0, 1)
                     ),
                     new Triangle( // back face
-                        new Vertex[] {
-                            new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                            new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                            new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                        },
-                        new Color(1, 0, 1)
+                    new Vertex[] {
+                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
+                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
+                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
+                    },
+                    new Color(1, 0, 1)
                     ),
                     new Triangle(
                         new Vertex[] {
-                            new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
                             new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
+                            new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
                             new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
                         },
                         new Color(1, 0, 1)
@@ -113,111 +113,6 @@ public class Cube extends GameObject {
         this.position = position;
         this.rotation = rotation;
         this.verticesColor = verticesColor;
-    }
-
-    @Override
-    public void setPosition(Vector3 position) {
-        this.position = position;
-        this.mesh = new Mesh(
-            new Triangle[] {
-                new Triangle(
-                    new Vertex[] { // front face
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(1, 0, 0)
-                ),
-                new Triangle(
-                    new Vertex[] {
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(1, 0, 0)
-                ),
-                new Triangle( // right face
-                    new Vertex[] {
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(0, 1, 0)
-                ),
-                new Triangle(
-                    new Vertex[] {
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(0, 1, 0)
-                ),
-                new Triangle( // bottom face
-                    new Vertex[] {
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(0, 0, 1)
-                ),
-                new Triangle(
-                    new Vertex[] {
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(0, 0, 1)
-                ),
-                new Triangle( // back face
-                    new Vertex[] {
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(1, 0, 1)
-                ),
-                new Triangle(
-                    new Vertex[] {
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(1, 0, 1)
-                ),
-                new Triangle( // top face
-                    new Vertex[] {
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(0, 1, 1)
-                ),
-                new Triangle(
-                    new Vertex[] {
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(0, 1, 1)
-                ),
-                new Triangle( // left face
-                    new Vertex[] {
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(1, 1, 0)
-                ),
-                new Triangle(
-                    new Vertex[] {
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, dimensions.z * 0.5f + position.z), verticesColor),
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
-                    },
-                    new Color(1, 1, 0)
-                ),
-            }
-        );
     }
 
     void setDimensions(Vector3 dimensions) {
@@ -282,8 +177,8 @@ public class Cube extends GameObject {
                 ),
                 new Triangle(
                     new Vertex[] {
-                        new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
                         new Vertex(new Vector3(-dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
+                        new Vertex(new Vector3(dimensions.x * 0.5f + position.x, -dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor),
                         new Vertex(new Vector3(dimensions.x * 0.5f + position.x, dimensions.y * 0.5f + position.y, -dimensions.z * 0.5f + position.z), verticesColor)
                     },
                     new Color(1, 0, 1)

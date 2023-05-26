@@ -31,13 +31,31 @@ public class Rectangle {
             if (a.contains(b)) return b;
             else if (b.contains(a)) return a;
             else {
+                if (a.bottom < b.bottom) {
+                    if (a.left < b.left) {
+                        if (a.left + a.width < b.left + b.width && a.bottom + a.height < b.bottom + b.height) return new Rectangle(b.left, b.bottom, a.left + a.width - b.left, a.bottom + a.height - b.bottom);
+                        if (a.left + a.width < b.left + b.width) return new Rectangle(b.left, b.bottom, a.left + a.width - b.left, b.height);
+                        if (a.bottom + a.height < b.bottom + b.height) return new Rectangle(b.height, b.bottom, b.width, a.bottom + a.height - b.bottom);
+                    } else {
+                        if (a.bottom + a.height < b.bottom + b.height && a.left + a.width > b.left + b.width) return new Rectangle(a.left, a.bottom, b.left + b.width - a.left, a.bottom + a.height - b.bottom); 
+                        if (a.bottom + a.height < b.bottom + b.height) return new Rectangle(a.left, b.bottom, a.width, a.bottom + a.height - b.bottom);
+                        if (a.)
+                    }
+                } else {
+                    if (a.bottom < b.bottom) {
+
+                    } else {
+
+                    }
+                }
                 if (a.bottom < b.bottom && a.left < b.left) return 
-                    (a.height > b.height) ? new Rectangle(b.left, b.bottom, a.left + a.width - b.left, b.height) : 
-                    (a.width > b.width) ? new Rectangle(b.left, b.bottom, b.width, a.bottom + a.height - b.bottom) : 
+                    (a.bottom + a.height > b.bottom + b.height) ? new Rectangle(b.left, b.bottom, a.left + a.width - b.left, b.height) : 
+                    (a.left + a.width > b.left + b.width) ? new Rectangle(b.left, b.bottom, b.width, a.bottom + a.height - b.bottom) : 
+                    // () ? :
                     new Rectangle(b.left, b.bottom, a.left + a.width - b.left, a.bottom + a.height - b.bottom);
                 else return 
-                    (b.height > a.height) ? new Rectangle(a.left, a.bottom, b.left + b.width - a.left, a.height) : 
-                    (b.width > a.width) ? new Rectangle(a.left, a.bottom, a.width, b.bottom + b.height - a.bottom) : 
+                    (b.bottom + b.height > a.bottom + a.height) ? new Rectangle(a.left, a.bottom, b.left + b.width - a.left, a.height) : 
+                    (b.left + b.width > a.left + a.width) ? new Rectangle(a.left, a.bottom, a.width, b.bottom + b.height - a.bottom) : 
                     new Rectangle(a.left, a.bottom, b.left + b.width - a.left, b.bottom + b.height - a.bottom);
             }
         }

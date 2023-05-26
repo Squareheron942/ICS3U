@@ -1,8 +1,10 @@
 public class LUTs {
-    public static float sin(float a) { return sin[Math.round(a) % 360]; }
-    public static float cos(float a) { return cos[Math.round(a) % 360]; }
-    public static float cot(float a) { return cot[Math.round(a) % 180]; }
+    public static float sin(float a) { return sin[Math.round(toPos(a)) % 360]; }
+    public static float cos(float a) { return cos[Math.round(toPos(a)) % 360]; }
+    public static float cot(float a) { return cot[Math.round(toPos(a)) % 180]; }
 
+    private static float toPos(float n) {return (n < 0) ? toPos(n + 360) : n;
+}
     private static float[] sin = {
         0.0f,
         0.01745240643728351f,

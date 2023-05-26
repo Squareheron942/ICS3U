@@ -3,14 +3,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.*;
 import javax.swing.*;
-import java.awt.image.*;
-import javax.swing.event.*;
 
 public class Renderer {
     public static int renderMode = 0;
-    private static JFrame frame;
-    private static JPanel renderPanel;
-    private static BufferedImage img = new BufferedImage(600, 600, BufferedImage.TYPE_INT_RGB);
+    public static RenderFrame frame;
+    private static RenderPanel renderPanel = new RenderPanel();
     private static float[][] zbuf; 
     public static Pixel[][] render(Scene scene, PerspectiveCamera cam) {
         // project to 2D
@@ -25,8 +22,8 @@ public class Renderer {
         }
 
         // rasterize into pixels
-        Pixel[][] fbuf = new Pixel[img.getWidth()][img.getHeight()];
-        zbuf = new float[img.getWidth()][img.getHeight()];
+        Pixel[][] fbuf = new Pixel[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
+        zbuf = new float[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
 
         for (Pixel[] row: fbuf) Arrays.fill(row, new Pixel());
         for (float[] row : zbuf) Arrays.fill(row, 0.0f);
@@ -39,10 +36,10 @@ public class Renderer {
                 Vertex v2 = t.vertices[1];
                 Vertex v3 = t.vertices[2];
 
-                int minX = (int) Math.round(Math.max(-img.getWidth(), Math.ceil(Math.min(v1.worldPos.x, Math.min(v2.worldPos.x, v3.worldPos.x)))));
-                int maxX = (int) Math.round(Math.min(img.getWidth() >> 1 - 1, Math.floor(Math.max(v1.worldPos.x, Math.max(v2.worldPos.x, v3.worldPos.x)))));
-                int minY = (int) Math.round(Math.max(-img.getHeight(), Math.ceil(Math.min(v1.worldPos.y, Math.min(v2.worldPos.y, v3.worldPos.y)))));
-                int maxY = (int) Math.round(Math.min(img.getHeight() >> 1 - 1, Math.floor(Math.max(v1.worldPos.y, Math.max(v2.worldPos.y, v3.worldPos.y)))));
+                int minX = (int) Math.round(Math.max(-renderPanel.img.getWidth(), Math.ceil(Math.min(v1.worldPos.x, Math.min(v2.worldPos.x, v3.worldPos.x)))));
+                int maxX = (int) Math.round(Math.min(renderPanel.img.getWidth() >> 1 - 1, Math.floor(Math.max(v1.worldPos.x, Math.max(v2.worldPos.x, v3.worldPos.x)))));
+                int minY = (int) Math.round(Math.max(-renderPanel.img.getHeight(), Math.ceil(Math.min(v1.worldPos.y, Math.min(v2.worldPos.y, v3.worldPos.y)))));
+                int maxY = (int) Math.round(Math.min(renderPanel.img.getHeight() >> 1 - 1, Math.floor(Math.max(v1.worldPos.y, Math.max(v2.worldPos.y, v3.worldPos.y)))));
 
                 for (int y = minY; y <= maxY; y++) {
                     for (int x = minX; x <= maxX; x++) {
@@ -55,11 +52,11 @@ public class Renderer {
                         if (V3 && V2 && V1) {
                             try {
                                 Vector3 bary = bary(v1.worldPos, v2.worldPos, v3.worldPos, p);
-                                float zVal = 1 - ((cam.nearClip - 1 / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (float)(cam.farClip));
+                                float zVal = 1 - ((cam.nearClip - 1 / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (cam.farClip - cam.nearClip));
 
-                                if (zbuf[x + img.getWidth() >> 1][y + img.getHeight() >> 1] < zVal && zVal <= 1 && zVal >= 0) {
-                                    fbuf[x + img.getWidth() >> 1][-y + img.getHeight() >> 1] = new Pixel(t.worldNormal, renderMode == 0 ? t.color : renderMode == 1 ? new Color(zVal, zVal, zVal) : new Color(bary.x, bary.y, bary.z));
-                                    zbuf[x + img.getWidth() >> 1][y + img.getHeight() >> 1] = zVal;
+                                if (zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] < zVal && zVal <= 1 && zVal >= 0) {
+                                    fbuf[x + renderPanel.img.getWidth() >> 1][-y + renderPanel.img.getHeight() >> 1] = new Pixel(t.worldNormal, renderMode == 0 ? t.color : renderMode == 1 ? new Color(zVal, zVal, zVal) : new Color(bary.x, bary.y, bary.z));
+                                    zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] = zVal;
                                 }
                             } catch (Exception e) {}
                         }
@@ -108,7 +105,7 @@ public class Renderer {
         }
 
         // rasterize into pixels
-        Pixel[][] fbuf = new Pixel[img.getWidth()][img.getHeight()];
+        Pixel[][] fbuf = new Pixel[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
 
         for (Pixel[] row: fbuf) {
             Arrays.fill(row, new Pixel());
@@ -122,17 +119,17 @@ public class Renderer {
 
                 try {
                     for (int k = 0; k < a.size(); k++) {
-                        fbuf[(int)a.get(k).x + img.getWidth() >> 1][(int)-a.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[0].color, t.vertices[1].color, k / (float)a.size()));
+                        fbuf[(int)a.get(k).x + renderPanel.img.getWidth() >> 1][(int)-a.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[0].color, t.vertices[1].color, k / (float)a.size()));
                     }
                 } catch (Exception e) {} 
                 try {
                     for (int k = 0; k < b.size(); k++) {                    
-                        fbuf[(int)b.get(k).x + img.getWidth() >> 1][(int)-b.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[1].color, t.vertices[2].color, k / (float)b.size()));
+                        fbuf[(int)b.get(k).x + renderPanel.img.getWidth() >> 1][(int)-b.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[1].color, t.vertices[2].color, k / (float)b.size()));
                     }
                 } catch (Exception e) {} 
                 try {
                     for (int k = 0; k < c.size(); k++) {
-                        fbuf[(int)c.get(k).x + img.getWidth() >> 1][(int)-c.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[2].color, t.vertices[0].color, k / (float)c.size()));
+                        fbuf[(int)c.get(k).x + renderPanel.img.getWidth() >> 1][(int)-c.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[2].color, t.vertices[0].color, k / (float)c.size()));
                     }
                 } catch (Exception e) {} 
             }
@@ -144,7 +141,7 @@ public class Renderer {
         for (int u = 0; u < fbuf.length; u++) {
             for (int v = 0; v < fbuf[0].length; v++) {
                 try {
-                    img.setRGB(u, v, new java.awt.Color(fbuf[u][v].color.r, fbuf[u][v].color.g, fbuf[u][v].color.b).getRGB());
+                    renderPanel.img.setRGB(u, v, new java.awt.Color(fbuf[u][v].color.r, fbuf[u][v].color.g, fbuf[u][v].color.b).getRGB());
                 } catch (Exception e) {}
             }
         }
@@ -153,10 +150,34 @@ public class Renderer {
 
     private static Triangle project2D(Triangle tri, PerspectiveCamera cam) {
         Vertex[] vertices = new Vertex[3];
-        float focalLength = (img.getWidth() >> 1) * LUTs.cot((int)cam.fov() >> 1); // f = (width/2) * ctg(HFOV/2)
+        float focalLength = (renderPanel.img.getWidth() >> 1) * LUTs.cot((int)cam.fov() >> 1); // f = (width/2) * ctg(HFOV/2)
+        float n = focalLength;
         for (int i = 0; i < 3; i++) {
-            float zratio = focalLength / (-tri.vertices[i].worldPos.z + focalLength);
-            vertices[i] = new Vertex(new Vector3(tri.vertices[i].worldPos.x * zratio, tri.vertices[i].worldPos.y * zratio, tri.vertices[i].worldPos.z), tri.vertices[i].color);
+            Vector3 vp = new Vector3(
+                tri.vertices[i].worldPos.x - cam.position.x,
+                tri.vertices[i].worldPos.y - cam.position.y,
+                tri.vertices[i].worldPos.z - cam.position.z
+            );
+
+            float u = cam.rotation.x, v = cam.rotation.y, w = cam.rotation.z;
+
+            Vector3 vPos = new Vector3(
+                (vp.x * (LUTs.cos(v) * LUTs.cos(w))) + (vp.y * (LUTs.sin(u) * LUTs.sin(v) * LUTs.cos(w) - LUTs.cos(u) * LUTs.sin(w))) + (vp.z * (LUTs.sin(u) * LUTs.sin(w) + LUTs.cos(u) * LUTs.sin(v) * LUTs.cos(w))), 
+                (vp.x * (LUTs.cos(v) * LUTs.sin(w))) + (vp.y * (LUTs.cos(u) * LUTs.cos(w) + LUTs.sin(u) * LUTs.sin(v) * LUTs.sin(w))) + (vp.z * (LUTs.cos(u) * LUTs.sin(v) * LUTs.sin(w) - LUTs.sin(u) * LUTs.cos(w))),
+                (vp.x * (-LUTs.sin(v))) + (vp.y * (LUTs.sin(u) * LUTs.cos(v))) + (vp.z * (LUTs.cos(u) * LUTs.cos(v)))
+            );
+
+            // vertices[i] = new Vertex(
+            //     new Vector3(
+            //         vPos.x * focalLength / ((renderPanel.img.getWidth() >> 1) * vPos.z),
+            //         vPos.y * focalLength / ((renderPanel.img.getHeight() >> 1) * vPos.z),
+            //         vPos.z
+            //     )
+            // );
+            // float zratio = focalLength / (-(vPos.z) + focalLength);
+            float zratio = 1 / vPos.z;
+            // float zratio = 1;
+            vertices[i] = new Vertex(new Vector3((vPos.x) * zratio * -(renderPanel.img.getWidth() >> 1), (vPos.y) * zratio * -(renderPanel.img.getHeight() >> 1), vPos.z), tri.vertices[i].color);
         }
 
         return new Triangle(vertices, tri.color);
@@ -210,38 +231,19 @@ public class Renderer {
                 err = err + dx;
                 A.y = A.y + sy;
             }
-        }                                
+        }
         return line;
     }
 
     public static boolean init(Scene scene, Camera cam) {
         try {
-            frame = new JFrame("3D Renderer Project");
+            frame = new RenderFrame("3D Renderer Project");
             Container pane = frame.getContentPane();
             pane.setLayout(new BorderLayout());
 
-            renderPanel = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    Graphics2D g2 = (Graphics2D)g;
-                    g2.drawImage(img, 0, 0, null);
-                    img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-                }
-            };
+            renderPanel = new RenderPanel();
 
             pane.add(renderPanel, BorderLayout.CENTER);
-
-            JSlider xpos = new JSlider(-300, 300, 0);
-            xpos.addChangeListener(new xListener());
-            pane.add(xpos, BorderLayout.PAGE_START);
-
-            JSlider ypos = new JSlider(-300, 300, 0);
-            ypos.addChangeListener(new yListener());
-            pane.add(ypos, BorderLayout.LINE_START);
-
-            JSlider zpos = new JSlider(-305, 0, -5);
-            zpos.addChangeListener(new zListener());
-            pane.add(zpos, BorderLayout.PAGE_END);
 
             frame.setSize(600, 600);
             frame.setVisible(true);
@@ -262,7 +264,7 @@ public class Renderer {
 
         if ((c.x - a.x) * as_y - (c.y - a.y) * as_x > 0 == s_ab) 
             return false;
-        if ((c.x - b.x) * (s.y - b.y) - (c.y - b.y)*(s.x - b.x) > 0 != s_ab) 
+        if ((c.x - b.x) * (s.y - b.y) - (c.y - b.y) * (s.x - b.x) > 0 != s_ab) 
             return false;
         return true;
 
@@ -283,34 +285,4 @@ public class Renderer {
     // Compute barycentric coordinates (u, v, w) for
     // point p with respect to triangle (a, b, c)
 
-}
-
-class xListener implements ChangeListener {
-    public void stateChanged(ChangeEvent e) {
-        JSlider source = (JSlider)e.getSource();
-        int x = (int)source.getValue();
-        GameObject cube = (Main.scene.children.get(0));
-        cube.setPosition(new Vector3(x, Main.scene.children.get(0).position().y, Main.scene.children.get(0).position().z));
-        Main.scene.children.set(0, cube);
-    }
-}
-
-class yListener implements ChangeListener {
-    public void stateChanged(ChangeEvent e) {
-        JSlider source = (JSlider)e.getSource();
-        int y = (int)source.getValue();
-        GameObject cube = (Main.scene.children.get(0));
-        cube.setPosition(new Vector3(Main.scene.children.get(0).position().x, y, Main.scene.children.get(0).position().z));
-        Main.scene.children.set(0, cube);
-    }
-}
-
-class zListener implements ChangeListener {
-    public void stateChanged(ChangeEvent e) {
-        JSlider source = (JSlider)e.getSource();
-        int z = (int)source.getValue();
-        GameObject cube = (Main.scene.children.get(0));
-        cube.setPosition(new Vector3(Main.scene.children.get(0).position().x, Main.scene.children.get(0).position().y, z));
-        Main.scene.children.set(0, cube);
-    }
 }
