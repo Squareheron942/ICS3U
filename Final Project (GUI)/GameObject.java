@@ -3,6 +3,7 @@ public class GameObject {
     Material[] mats = new Material[1];
     protected Vector3 rotation = new Vector3();
     protected Vector3 position = new Vector3();
+    protected Vector3 scale = new Vector3(1, 1, 1);
 
     GameObject(Mesh mesh, Material mat) {
         this.mesh = mesh;

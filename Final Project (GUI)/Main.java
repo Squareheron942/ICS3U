@@ -99,7 +99,7 @@ public class Main {
             new Vector3(0, 0, 0), // position
             new Vector3(0, 0, 0), // rotation
             75,
-            0.01f,
+            1f,
             3000
         );
 
@@ -114,16 +114,16 @@ public class Main {
             public void run() {
                 counter++;
                 dTime = (-lTime + (lTime = System.currentTimeMillis())) / (float)10;
-            if (Renderer.frame.keysHeld.contains((int)'W')) cam.position.z -= 3 * dTime;
-            if (Renderer.frame.keysHeld.contains((int)'S')) cam.position.z += 3 * dTime;
-            if (Renderer.frame.keysHeld.contains((int)'A')) cam.position.x -= 3 * dTime;
-            if (Renderer.frame.keysHeld.contains((int)'D')) cam.position.x += 3 * dTime;
+            if (Renderer.frame.keysHeld.contains((int)'W')) {cam.position.z -= 3 * dTime * LUTs.cos(cam.rotation.y);cam.position.x += 3 * dTime * LUTs.sin(cam.rotation.y);}
+            if (Renderer.frame.keysHeld.contains((int)'S')) {cam.position.z += 3 * dTime * LUTs.cos(cam.rotation.y);cam.position.x -= 3 * dTime * LUTs.sin(cam.rotation.y);}
+            if (Renderer.frame.keysHeld.contains((int)'A')) {cam.position.z -= 3 * dTime * LUTs.sin(cam.rotation.y);cam.position.x -= 3 * dTime * LUTs.cos(cam.rotation.y);}
+            if (Renderer.frame.keysHeld.contains((int)'D')) {cam.position.z += 3 * dTime * LUTs.sin(cam.rotation.y);cam.position.x += 3 * dTime * LUTs.cos(cam.rotation.y);}
             if (Renderer.frame.keysHeld.contains((int)' ')) cam.position.y += 3 * dTime;
             if (Renderer.frame.keysHeld.contains(16)) cam.position.y -= 3 * dTime; // shift key character code
-            if (Renderer.frame.keysHeld.contains(38)) cam.rotation.x -= 1 * dTime;
-            if (Renderer.frame.keysHeld.contains(40)) cam.rotation.x += 1 * dTime;
-            if (Renderer.frame.keysHeld.contains(37)) cam.rotation.y -= 1 * dTime;
-            if (Renderer.frame.keysHeld.contains(39)) cam.rotation.y += 1 * dTime;
+            if (Renderer.frame.keysHeld.contains(38)) cam.rotation.x -= 1 * dTime; // up arrow
+            if (Renderer.frame.keysHeld.contains(40)) cam.rotation.x += 1 * dTime; // down arrow
+            if (Renderer.frame.keysHeld.contains(37)) cam.rotation.y -= 1 * dTime; // left arrow
+            if (Renderer.frame.keysHeld.contains(39)) cam.rotation.y += 1 * dTime; // right arrow
             if (Renderer.frame.keysHeld.contains((int)'F')) {
                 if (Renderer.frame.keysHeld.contains((int)'0')) cam.setFov(10);
                 if (Renderer.frame.keysHeld.contains((int)'1')) cam.setFov(20);
@@ -139,20 +139,21 @@ public class Main {
                 if (Renderer.frame.keysHeld.contains((int)'0')) Renderer.renderMode = 0;
                 if (Renderer.frame.keysHeld.contains((int)'1')) Renderer.renderMode = 1;
                 if (Renderer.frame.keysHeld.contains((int)'2')) Renderer.renderMode = 2;
+                if (Renderer.frame.keysHeld.contains((int)'3')) Renderer.renderMode = 3;
             } else {
 
             }
             // cube.setPosition(new Vector3((LUTs.sin(counter) * 300), 0, -100));
-            cube.setRotation(new Vector3(0, counter, 0));
+            cube.setRotation(new Vector3(counter, 0, 0));
             // scene.children.set(0, cube);
             Pixel[][] fbuf = Renderer.render(scene, cam);
             Renderer.draw(fbuf);
             // del_line();
             // del_line();
-            del_line();
+            // del_line();
             // System.out.println(1000 / (dTime * 10));
             // System.out.println(cam.position);
-            System.out.println(Renderer.frame.keysHeld);
+            // System.out.println(Renderer.frame.keysHeld);
             }
         };
         timer.scheduleAtFixedRate(t, 0, 16);

@@ -1,9 +1,17 @@
 public class Color {
+    private final float inv255 = 1 / 255f;
     float r, g, b, a; /*[0, 1] */
     Color() {
-        r = 0;
-        g = 0;
-        b = 0;
+        r = 1;
+        g = 1;
+        b = 1;
+        a = 1;
+    }
+
+    Color(int rgb) {
+        r = ((rgb & 0xff0000) >> 16) * inv255;
+        g = ((rgb & 0x00ff00) >> 8) * inv255;
+        b = ((rgb & 0x0000ff)) * inv255;
         a = 1;
     }
 
@@ -32,6 +40,14 @@ public class Color {
         this.r = this.r + ratio * (o.r - this.r);
         this.g = this.g + ratio * (o.g - this.g);
         this.b = this.b + ratio * (o.b - this.b);
+    }
+
+    Color mul(Color c) {
+        return new Color(
+            this.r * c.r,
+            this.g * c.g,
+            this.b * c.b
+        );
     }
 
     @Override

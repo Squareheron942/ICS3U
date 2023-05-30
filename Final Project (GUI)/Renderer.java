@@ -15,7 +15,10 @@ public class Renderer {
         for (int i = 0; i < scene.children.size(); i++) {
             Triangle[] tris = new Triangle[scene.children.get(i).mesh.tris.length];
             for (int j = 0; j < tris.length; j++) {
-                tris[j] = project2D(scene.children.get(i).mesh.tris[j], cam);
+                Triangle t = project2D(scene.children.get(i).mesh.tris[j], cam);
+                if (t.vertices[0].worldPos.z < 0 && t.vertices[1].worldPos.z < 0 && t.vertices[2].worldPos.z < 0) {
+                    tris[j] = t;
+                } else tris[j] = null;
             }
             GameObject object = new GameObject(new Mesh(tris), scene.children.get(i).mats);
             objects[i] = object;
@@ -25,16 +28,19 @@ public class Renderer {
         Pixel[][] fbuf = new Pixel[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
         zbuf = new float[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
 
-        for (Pixel[] row: fbuf) Arrays.fill(row, new Pixel());
+        for (Pixel[] row: fbuf) Arrays.fill(row, new Pixel(new Vector3(), new Color(0, 0.5f, 0.5f)));
         for (float[] row : zbuf) Arrays.fill(row, 0.0f);
 
         
 
         for (GameObject object : objects) {
             for (Triangle t : object.mesh.tris) {
+                if (t == null) continue; // skip culled triangles
                 Vertex v1 = t.vertices[0];
                 Vertex v2 = t.vertices[1];
                 Vertex v3 = t.vertices[2];
+
+                Vector3 invZ = new Vector3(1 / v1.worldPos.z, 1 / v2.worldPos.z, 1 / v3.worldPos.z);
 
                 int minX = (int) Math.round(Math.max(-renderPanel.img.getWidth(), Math.ceil(Math.min(v1.worldPos.x, Math.min(v2.worldPos.x, v3.worldPos.x)))));
                 int maxX = (int) Math.round(Math.min(renderPanel.img.getWidth() >> 1 - 1, Math.floor(Math.max(v1.worldPos.x, Math.max(v2.worldPos.x, v3.worldPos.x)))));
@@ -51,11 +57,26 @@ public class Renderer {
 
                         if (V3 && V2 && V1) {
                             try {
-                                Vector3 bary = bary(v1.worldPos, v2.worldPos, v3.worldPos, p);
+                                Vector3 bary = persp_bary(v1.worldPos, v2.worldPos, v3.worldPos, p, invZ);
                                 float zVal = 1 - ((cam.nearClip - 1 / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (cam.farClip - cam.nearClip));
 
                                 if (zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] < zVal && zVal <= 1 && zVal >= 0) {
-                                    fbuf[x + renderPanel.img.getWidth() >> 1][-y + renderPanel.img.getHeight() >> 1] = new Pixel(t.worldNormal, renderMode == 0 ? t.color : renderMode == 1 ? new Color(zVal, zVal, zVal) : new Color(bary.x, bary.y, bary.z));
+                                    fbuf[x + renderPanel.img.getWidth() >> 1][-y + renderPanel.img.getHeight() >> 1] = new Pixel(
+                                        t.worldNormal, renderMode == 0 ? (
+                                            t.color.mul(
+                                                object.mats[0]._MainTex.get(
+                                                    new Vector2(
+                                                        bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x,
+                                                        bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y
+                                                    )
+                                                )
+                                            )
+                                        ) : 
+                                        renderMode == 1 ? new Color(zVal, zVal, zVal) : 
+                                        renderMode == 2 ? new Color(bary.x, bary.y, bary.z) : 
+                                        renderMode == 3 ? new Color(bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x, bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y, 0) : 
+                                        new Color() 
+                                    );
                                     zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] = zVal;
                                 }
                             } catch (Exception e) {}
@@ -151,7 +172,10 @@ public class Renderer {
     private static Triangle project2D(Triangle tri, PerspectiveCamera cam) {
         Vertex[] vertices = new Vertex[3];
         float focalLength = (renderPanel.img.getWidth() >> 1) * LUTs.cot((int)cam.fov() >> 1); // f = (width/2) * ctg(HFOV/2)
-        float n = focalLength;
+        // float focalLength = 1;
+        // float focalX = focalLength / renderPanel.img.getWidth();
+        // float focalY = focalLength / renderPanel.img.getHeight();
+        float focalX = 1, focalY = 1;
         for (int i = 0; i < 3; i++) {
             Vector3 vp = new Vector3(
                 tri.vertices[i].worldPos.x - cam.position.x,
@@ -161,11 +185,31 @@ public class Renderer {
 
             float u = cam.rotation.x, v = cam.rotation.y, w = cam.rotation.z;
 
-            Vector3 vPos = new Vector3(
-                (vp.x * (LUTs.cos(v) * LUTs.cos(w))) + (vp.y * (LUTs.sin(u) * LUTs.sin(v) * LUTs.cos(w) - LUTs.cos(u) * LUTs.sin(w))) + (vp.z * (LUTs.sin(u) * LUTs.sin(w) + LUTs.cos(u) * LUTs.sin(v) * LUTs.cos(w))), 
-                (vp.x * (LUTs.cos(v) * LUTs.sin(w))) + (vp.y * (LUTs.cos(u) * LUTs.cos(w) + LUTs.sin(u) * LUTs.sin(v) * LUTs.sin(w))) + (vp.z * (LUTs.cos(u) * LUTs.sin(v) * LUTs.sin(w) - LUTs.sin(u) * LUTs.cos(w))),
-                (vp.x * (-LUTs.sin(v))) + (vp.y * (LUTs.sin(u) * LUTs.cos(v))) + (vp.z * (LUTs.cos(u) * LUTs.cos(v)))
-            );
+            float[][] xRot = {
+                {1, 0, 0},
+                {0, LUTs.cos(u), -LUTs.sin(u)},
+                {0, LUTs.sin(u), LUTs.cos(u)}
+            };
+
+            float[][] yRot = {
+                {LUTs.cos(v), 0, LUTs.sin(v)},
+                {0, 1, 0},
+                {-LUTs.sin(v), 0, LUTs.cos(v)}
+            };
+
+            float[][] zRot = {
+                {LUTs.cos(w), -LUTs.sin(w), 0},
+                {LUTs.sin(w), LUTs.cos(w), 0},
+                {0, 0, 1}
+            };
+
+            Vector3 vPos = Vector3.mul(Vector3.mul(Vector3.mul(vp, yRot), xRot), zRot);
+
+            // Vector3 vPos = new Vector3(
+            //     (vp.x * (LUTs.cos(v) * LUTs.cos(w))) + (vp.y * (LUTs.sin(u) * LUTs.sin(v) * LUTs.cos(w) - LUTs.cos(u) * LUTs.sin(w))) + (vp.z * (LUTs.sin(u) * LUTs.sin(w) + LUTs.cos(u) * LUTs.sin(v) * LUTs.cos(w))), 
+            //     (vp.x * (LUTs.cos(v) * LUTs.sin(w))) + (vp.y * (LUTs.cos(u) * LUTs.cos(w) + LUTs.sin(u) * LUTs.sin(v) * LUTs.sin(w))) + (vp.z * (LUTs.cos(u) * LUTs.sin(v) * LUTs.sin(w) - LUTs.sin(u) * LUTs.cos(w))),
+            //     (vp.x * (-LUTs.sin(v))) + (vp.y * (LUTs.sin(u) * LUTs.cos(v))) + (vp.z * (LUTs.cos(u) * LUTs.cos(v)))
+            // );
 
             // vertices[i] = new Vertex(
             //     new Vector3(
@@ -175,9 +219,18 @@ public class Renderer {
             //     )
             // );
             // float zratio = focalLength / (-(vPos.z) + focalLength);
-            float zratio = 1 / vPos.z;
+            float zratio = 1f / vPos.z;
+            // (f, 0, 0)
+            // (0, f, 0)
+            // (0, 0, 1)
+            // z = z * 1
+            // x = f * x / z
+            // y = f * y / z
             // float zratio = 1;
-            vertices[i] = new Vertex(new Vector3((vPos.x) * zratio * -(renderPanel.img.getWidth() >> 1), (vPos.y) * zratio * -(renderPanel.img.getHeight() >> 1), vPos.z), tri.vertices[i].color);
+            float x = (vPos.x) * zratio * focalX * -(renderPanel.img.getWidth() >> 1);
+            float y = (vPos.y) * zratio * focalY * -(renderPanel.img.getHeight() >> 1);
+            vertices[i] = new Vertex(new Vector3(x, y, vPos.z), tri.vertices[i].color, tri.vertices[i].uv);
+            // vertices[i] = new Vertex(new Vector3(Math.max(Math.min(x, renderPanel.img.getWidth()), -renderPanel.img.getWidth()), Math.max(Math.min(y, renderPanel.img.getWidth()), -renderPanel.img.getWidth()), vPos.z), tri.vertices[i].color);
         }
 
         return new Triangle(vertices, tri.color);
@@ -245,7 +298,7 @@ public class Renderer {
 
             pane.add(renderPanel, BorderLayout.CENTER);
 
-            frame.setSize(600, 600);
+            frame.setSize(50, 50);
             frame.setVisible(true);
             frame.setResizable(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -284,5 +337,22 @@ public class Renderer {
     }
     // Compute barycentric coordinates (u, v, w) for
     // point p with respect to triangle (a, b, c)
+
+    private static Vector3 persp_bary(Vector3 a, Vector3 b, Vector3 c, Vector2 p, Vector3 invZ) {
+        Vector2 v0 = new Vector2(b.x - a.x, b.y - a.y), v1 = new Vector2(c.x - a.x, c.y - a.y), v2 = new Vector2(p.x - a.x, p.y - a.y);
+
+        float den = v0.x * v1.y - v1.x * v0.y;
+
+        float v = (v2.x * v1.y - v1.x * v2.y) / den;
+        float w = (v0.x * v2.y - v2.x * v0.y) / den;
+        float u = 1.0f - v - w;
+
+        //TODO optimize this
+        float _u = u * invZ.x, _v = v * invZ.y, _w = w * invZ.z;
+        Vector3 B = new Vector3(_u, _v, _w);
+        B.mul(1 / (_u + _v + _w));
+        return B;
+    }
+
 
 }
