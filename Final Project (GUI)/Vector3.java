@@ -25,11 +25,26 @@ public class Vector3 {
         );
     }
 
+    static Vector3 mul(Vector3 v, float m) {
+        return new Vector3(
+            v.x * m,
+            v.y * m,
+            v.z * m
+        );
+    }
+
     void mul(float v) {
         this.x *= v;
         this.y *= v;
         this.z *= v;
     }
+    void add(Vector3 v) {
+        this.x += v.x;
+        this.y += v.y;
+        this.z += v.z;
+    }
+    void div(float v) { this.mul(1 / v);}
+    void sub(Vector3 v) {this.add(Vector3.mul(this, -1));}
 
     static float dot(Vector3 a, Vector3 b) {
         return a.x * b.x + a.y * b.y + a.z * b.z;
@@ -43,8 +58,17 @@ public class Vector3 {
         return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
     }
 
+    static Vector3 normalize(Vector3 v) {
+        if (Vector3.magnitude(v) > 0) return Vector3.mul(v, 1 / Vector3.magnitude(v));
+        return new Vector3();
+    }
+
+    static float magnitude(Vector3 v) {
+        return (float)Math.abs(Math.sqrt(v.x * v.x + v.y * v.y * v.z * v.z));
+    }
+
     @Override
     public String toString() {
-        return "(" + x + ", " + y + ", " + z + ")";
+        return "Vector3(" + x + ", " + y + ", " + z + ")";
     }
 }

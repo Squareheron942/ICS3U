@@ -2,6 +2,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.*;
+import java.io.File;
+
 import javax.swing.*;
 
 public class Renderer {
@@ -9,7 +11,7 @@ public class Renderer {
     public static RenderFrame frame;
     private static RenderPanel renderPanel = new RenderPanel();
     private static float[][] zbuf; 
-    public static Pixel[][] render(Scene scene, PerspectiveCamera cam) {
+    public static Color[][] render(Scene scene, PerspectiveCamera cam) {
         // project to 2D
         GameObject[] objects = new GameObject[scene.children.size()];
         for (int i = 0; i < scene.children.size(); i++) {
@@ -25,66 +27,99 @@ public class Renderer {
         }
 
         // rasterize into pixels
-        Pixel[][] fbuf = new Pixel[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
+        Color[][] fbuf = new Color[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
         zbuf = new float[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
 
-        for (Pixel[] row: fbuf) Arrays.fill(row, new Pixel(new Vector3(), new Color(0, 0.5f, 0.5f)));
+        for (Color[] row: fbuf) Arrays.fill(row, new Color(0x808080));
         for (float[] row : zbuf) Arrays.fill(row, 0.0f);
 
         
 
         for (GameObject object : objects) {
-            for (Triangle t : object.mesh.tris) {
-                if (t == null) continue; // skip culled triangles
-                Vertex v1 = t.vertices[0];
-                Vertex v2 = t.vertices[1];
-                Vertex v3 = t.vertices[2];
+            for (Material m : object.mats) {
+                for (Triangle t : object.mesh.tris) {
+                    if (t == null) continue; // skip culled triangles
+                    Vertex v1 = t.vertices[0];
+                    Vertex v2 = t.vertices[1];
+                    Vertex v3 = t.vertices[2];
+    
+                    Vector3 invZ = new Vector3(1 / v1.worldPos.z, 1 / v2.worldPos.z, 1 / v3.worldPos.z);
+    
+                    int minX = (int) Math.round(Math.max(-renderPanel.img.getWidth(), Math.ceil(Math.min(v1.worldPos.x, Math.min(v2.worldPos.x, v3.worldPos.x)))));
+                    int maxX = (int) Math.round(Math.min(renderPanel.img.getWidth() >> 1 - 1, Math.floor(Math.max(v1.worldPos.x, Math.max(v2.worldPos.x, v3.worldPos.x)))));
+                    int minY = (int) Math.round(Math.max(-renderPanel.img.getHeight(), Math.ceil(Math.min(v1.worldPos.y, Math.min(v2.worldPos.y, v3.worldPos.y)))));
+                    int maxY = (int) Math.round(Math.min(renderPanel.img.getHeight() >> 1 - 1, Math.floor(Math.max(v1.worldPos.y, Math.max(v2.worldPos.y, v3.worldPos.y)))));
+    
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int x = minX; x <= maxX; x++) {
+                            Vector2 p = new Vector2(x,y);
+                            // Judge once for each vertex
+                            boolean V1 = sameSide(v1.worldPos, v2.worldPos, v3.worldPos, p);
+                            boolean V2 = sameSide(v2.worldPos, v3.worldPos, v1.worldPos, p);
+                            boolean V3 = sameSide(v3.worldPos, v1.worldPos, v2.worldPos, p);
+    
+                            if (V3 && V2 && V1) {
+                                try {
+                                    Vector3 bary = persp_bary(v1.worldPos, v2.worldPos, v3.worldPos, p, invZ);
+                                    float zVal = 1 - ((cam.nearClip - 1 / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (cam.farClip - cam.nearClip));
+                                    Vector2 uv = new Vector2(bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x, bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y);
+                                    // Vector3 normal = Vector3.normalize(new Vector3(bary.x * v1.normal.x + bary.y * v2.normal.x + bary.z * v3.normal.x, bary.x * v1.normal.y + bary.y * v2.normal.y + bary.z * v3.normal.y, bary.x * v1.normal.z + bary.y * v2.normal.z + bary.z * v3.normal.z));
+                                    Vector3 normal = t.worldNormal;
+                                    Color vCol = new Color(bary.x * v1.color.r + bary.y * v2.color.r + bary.z * v3.color.r, bary.x * v1.color.g + bary.y * v2.color.g + bary.z * v3.color.g, bary.x * v1.color.b + bary.y * v2.color.b + bary.z * v3.color.b);
+                                    Color o = null;
 
-                Vector3 invZ = new Vector3(1 / v1.worldPos.z, 1 / v2.worldPos.z, 1 / v3.worldPos.z);
-
-                int minX = (int) Math.round(Math.max(-renderPanel.img.getWidth(), Math.ceil(Math.min(v1.worldPos.x, Math.min(v2.worldPos.x, v3.worldPos.x)))));
-                int maxX = (int) Math.round(Math.min(renderPanel.img.getWidth() >> 1 - 1, Math.floor(Math.max(v1.worldPos.x, Math.max(v2.worldPos.x, v3.worldPos.x)))));
-                int minY = (int) Math.round(Math.max(-renderPanel.img.getHeight(), Math.ceil(Math.min(v1.worldPos.y, Math.min(v2.worldPos.y, v3.worldPos.y)))));
-                int maxY = (int) Math.round(Math.min(renderPanel.img.getHeight() >> 1 - 1, Math.floor(Math.max(v1.worldPos.y, Math.max(v2.worldPos.y, v3.worldPos.y)))));
-
-                for (int y = minY; y <= maxY; y++) {
-                    for (int x = minX; x <= maxX; x++) {
-                        Vector2 p = new Vector2(x,y);
-                        // Judge once for each vertex
-                        boolean V1 = sameSide(v1.worldPos, v2.worldPos, v3.worldPos, p);
-                        boolean V2 = sameSide(v2.worldPos, v3.worldPos, v1.worldPos, p);
-                        boolean V3 = sameSide(v3.worldPos, v1.worldPos, v2.worldPos, p);
-
-                        if (V3 && V2 && V1) {
-                            try {
-                                Vector3 bary = persp_bary(v1.worldPos, v2.worldPos, v3.worldPos, p, invZ);
-                                float zVal = 1 - ((cam.nearClip - 1 / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (cam.farClip - cam.nearClip));
-
-                                if (zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] < zVal && zVal <= 1 && zVal >= 0) {
-                                    fbuf[x + renderPanel.img.getWidth() >> 1][-y + renderPanel.img.getHeight() >> 1] = new Pixel(
-                                        t.worldNormal, renderMode == 0 ? (
-                                            t.color.mul(
-                                                object.mats[0]._MainTex.get(
-                                                    new Vector2(
-                                                        bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x,
-                                                        bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y
-                                                    )
-                                                )
-                                            )
-                                        ) : 
-                                        renderMode == 1 ? new Color(zVal, zVal, zVal) : 
-                                        renderMode == 2 ? new Color(bary.x, bary.y, bary.z) : 
-                                        renderMode == 3 ? new Color(bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x, bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y, 0) : 
-                                        new Color() 
-                                    );
-                                    zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] = zVal;
-                                }
-                            } catch (Exception e) {}
+                                    if (zVal <= 1 && zVal >= 0) { // ignore if outside of camera view
+                                        if (m.shader != null) { // if no shader then make magenta
+                                            if (!m.shader.zTest || (m.shader.zTest && zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] < zVal)) {
+                                                switch (renderMode) {
+                                                    case 0: // regular shading
+                                                        Pixel frag = new Pixel(vCol, normal, uv, bary, m, new Vector2(x, y), true);
+                                                        Color c = m.shader.frag(frag);
+                                                        o = m.shader.tags.get("RenderType").equals("Transparent") ? Color.lerp(fbuf[x][y], c, c.a) : m.shader.tags.get("RenderType").equals("TransparentCutout") ? Color.lerp(fbuf[x][y], c, (int)(c.a)) : m.shader.frag(frag);
+                                                        break;
+                                                    case 1: // depth buffer
+                                                        o = new Color(zVal, zVal, zVal);
+                                                        break;
+                                                    case 2: // barycentric coords
+                                                        o = new Color(bary.x, bary.y, bary.z);
+                                                        break;
+                                                    case 3: // uv coords
+                                                        o = new Color(bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x, bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y, 0);
+                                                        break;
+                                                    case 4: // normals
+                                                        o = new Color(normal.x, normal.y, normal.z);
+                                                        break;
+                                                }
+                                                fbuf[x + renderPanel.img.getWidth() >> 1][-y + renderPanel.img.getHeight() >> 1] = o;
+                                                if (m.shader.zWrite) zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] = zVal;
+                                            }
+                                        } else {
+                                            if (zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] < zVal) {
+                                                fbuf[x + renderPanel.img.getWidth() >> 1][-y + renderPanel.img.getHeight() >> 1] = new Color(0xff00ff);
+                                                zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] = zVal;
+                                            }
+                                        }
+                                    }
+                                } catch (Exception e) {}
+                            }
                         }
                     }
                 }
             }
         }
+
+        // Color.lerp(
+        //                                             fbuf[x][y].color,
+        //                                             t.color.mul(
+        //                                                 m._MainTex.get(
+        //                                                     new Vector2(
+        //                                                         bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x,
+        //                                                         bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y
+        //                                                     )
+        //                                                 )
+        //                                             ),
+        //                                             t.color.a
+        //                                         )
 
         // for (GameObject object : objects) {
         //     for (Triangle t : object.mesh.tris) {
@@ -113,56 +148,56 @@ public class Renderer {
     }
 
 
-    public static Pixel[][] render(Scene scene, OrthogonalCamera cam) {
-        // project to 2D
-        GameObject[] objects = new GameObject[scene.children.size()];
-        for (int i = 0; i < scene.children.size(); i++) {
-            Triangle[] tris = new Triangle[scene.children.get(i).mesh.tris.length];
-            for (int j = 0; j < tris.length; j++) {
-                tris[j] = project2D(scene.children.get(i).mesh.tris[j], cam);
-            }
-            GameObject object = new GameObject(new Mesh(tris), scene.children.get(i).mats);
-            objects[i] = object;
-        }
+    // public static Pixel[][] render(Scene scene, OrthogonalCamera cam) {
+    //     // project to 2D
+    //     GameObject[] objects = new GameObject[scene.children.size()];
+    //     for (int i = 0; i < scene.children.size(); i++) {
+    //         Triangle[] tris = new Triangle[scene.children.get(i).mesh.tris.length];
+    //         for (int j = 0; j < tris.length; j++) {
+    //             tris[j] = project2D(scene.children.get(i).mesh.tris[j], cam);
+    //         }
+    //         GameObject object = new GameObject(new Mesh(tris), scene.children.get(i).mats);
+    //         objects[i] = object;
+    //     }
 
-        // rasterize into pixels
-        Pixel[][] fbuf = new Pixel[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
+    //     // rasterize into pixels
+    //     Pixel[][] fbuf = new Pixel[renderPanel.img.getWidth()][renderPanel.img.getHeight()];
 
-        for (Pixel[] row: fbuf) {
-            Arrays.fill(row, new Pixel());
-        }
+    //     for (Pixel[] row: fbuf) {
+    //         Arrays.fill(row, new Pixel());
+    //     }
 
-        for (GameObject object : objects) {
-            for (Triangle t : object.mesh.tris) {
-                List<Vector2> a = findLine(t.vertices[0].worldPos, t.vertices[1].worldPos);
-                List<Vector2> b = findLine(t.vertices[1].worldPos, t.vertices[2].worldPos);
-                List<Vector2> c = findLine(t.vertices[2].worldPos, t.vertices[0].worldPos);
+    //     for (GameObject object : objects) {
+    //         for (Triangle t : object.mesh.tris) {
+    //             List<Vector2> a = findLine(t.vertices[0].worldPos, t.vertices[1].worldPos);
+    //             List<Vector2> b = findLine(t.vertices[1].worldPos, t.vertices[2].worldPos);
+    //             List<Vector2> c = findLine(t.vertices[2].worldPos, t.vertices[0].worldPos);
 
-                try {
-                    for (int k = 0; k < a.size(); k++) {
-                        fbuf[(int)a.get(k).x + renderPanel.img.getWidth() >> 1][(int)-a.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[0].color, t.vertices[1].color, k / (float)a.size()));
-                    }
-                } catch (Exception e) {} 
-                try {
-                    for (int k = 0; k < b.size(); k++) {                    
-                        fbuf[(int)b.get(k).x + renderPanel.img.getWidth() >> 1][(int)-b.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[1].color, t.vertices[2].color, k / (float)b.size()));
-                    }
-                } catch (Exception e) {} 
-                try {
-                    for (int k = 0; k < c.size(); k++) {
-                        fbuf[(int)c.get(k).x + renderPanel.img.getWidth() >> 1][(int)-c.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[2].color, t.vertices[0].color, k / (float)c.size()));
-                    }
-                } catch (Exception e) {} 
-            }
-        }
-        return fbuf;
-    }
+    //             try {
+    //                 for (int k = 0; k < a.size(); k++) {
+    //                     fbuf[(int)a.get(k).x + renderPanel.img.getWidth() >> 1][(int)-a.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[0].color, t.vertices[1].color, k / (float)a.size()));
+    //                 }
+    //             } catch (Exception e) {} 
+    //             try {
+    //                 for (int k = 0; k < b.size(); k++) {                    
+    //                     fbuf[(int)b.get(k).x + renderPanel.img.getWidth() >> 1][(int)-b.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[1].color, t.vertices[2].color, k / (float)b.size()));
+    //                 }
+    //             } catch (Exception e) {} 
+    //             try {
+    //                 for (int k = 0; k < c.size(); k++) {
+    //                     fbuf[(int)c.get(k).x + renderPanel.img.getWidth() >> 1][(int)-c.get(k).y + renderPanel.img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[2].color, t.vertices[0].color, k / (float)c.size()));
+    //                 }
+    //             } catch (Exception e) {} 
+    //         }
+    //     }
+    //     return fbuf;
+    // }
 
-    static void draw(Pixel[][] fbuf) {
+    static void draw(Color[][] fbuf) {
         for (int u = 0; u < fbuf.length; u++) {
             for (int v = 0; v < fbuf[0].length; v++) {
                 try {
-                    renderPanel.img.setRGB(u, v, new java.awt.Color(fbuf[u][v].color.r, fbuf[u][v].color.g, fbuf[u][v].color.b).getRGB());
+                    renderPanel.img.setRGB(u, v, new java.awt.Color(fbuf[u][v].r, fbuf[u][v].g, fbuf[u][v].b).getRGB());
                 } catch (Exception e) {}
             }
         }
@@ -173,9 +208,9 @@ public class Renderer {
         Vertex[] vertices = new Vertex[3];
         float focalLength = (renderPanel.img.getWidth() >> 1) * LUTs.cot((int)cam.fov() >> 1); // f = (width/2) * ctg(HFOV/2)
         // float focalLength = 1;
-        // float focalX = focalLength / renderPanel.img.getWidth();
-        // float focalY = focalLength / renderPanel.img.getHeight();
-        float focalX = 1, focalY = 1;
+        float focalX = focalLength / renderPanel.img.getWidth();
+        float focalY = focalLength / renderPanel.img.getHeight();
+        // float focalX = 1, focalY = 1;
         for (int i = 0; i < 3; i++) {
             Vector3 vp = new Vector3(
                 tri.vertices[i].worldPos.x - cam.position.x,
@@ -205,12 +240,6 @@ public class Renderer {
 
             Vector3 vPos = Vector3.mul(Vector3.mul(Vector3.mul(vp, yRot), xRot), zRot);
 
-            // Vector3 vPos = new Vector3(
-            //     (vp.x * (LUTs.cos(v) * LUTs.cos(w))) + (vp.y * (LUTs.sin(u) * LUTs.sin(v) * LUTs.cos(w) - LUTs.cos(u) * LUTs.sin(w))) + (vp.z * (LUTs.sin(u) * LUTs.sin(w) + LUTs.cos(u) * LUTs.sin(v) * LUTs.cos(w))), 
-            //     (vp.x * (LUTs.cos(v) * LUTs.sin(w))) + (vp.y * (LUTs.cos(u) * LUTs.cos(w) + LUTs.sin(u) * LUTs.sin(v) * LUTs.sin(w))) + (vp.z * (LUTs.cos(u) * LUTs.sin(v) * LUTs.sin(w) - LUTs.sin(u) * LUTs.cos(w))),
-            //     (vp.x * (-LUTs.sin(v))) + (vp.y * (LUTs.sin(u) * LUTs.cos(v))) + (vp.z * (LUTs.cos(u) * LUTs.cos(v)))
-            // );
-
             // vertices[i] = new Vertex(
             //     new Vector3(
             //         vPos.x * focalLength / ((renderPanel.img.getWidth() >> 1) * vPos.z),
@@ -226,14 +255,12 @@ public class Renderer {
             // z = z * 1
             // x = f * x / z
             // y = f * y / z
-            // float zratio = 1;
             float x = (vPos.x) * zratio * focalX * -(renderPanel.img.getWidth() >> 1);
             float y = (vPos.y) * zratio * focalY * -(renderPanel.img.getHeight() >> 1);
-            vertices[i] = new Vertex(new Vector3(x, y, vPos.z), tri.vertices[i].color, tri.vertices[i].uv);
-            // vertices[i] = new Vertex(new Vector3(Math.max(Math.min(x, renderPanel.img.getWidth()), -renderPanel.img.getWidth()), Math.max(Math.min(y, renderPanel.img.getWidth()), -renderPanel.img.getWidth()), vPos.z), tri.vertices[i].color);
+            vertices[i] = new Vertex(new Vector3(x, y, vPos.z), tri.vertices[i].color, tri.vertices[i].uv, tri.vertices[i].normal);
         }
 
-        return new Triangle(vertices, tri.color);
+        return new Triangle(vertices, tri.worldNormal);
     }
 
     private static Triangle project2D(Triangle tri, OrthogonalCamera cam) {
@@ -242,7 +269,7 @@ public class Renderer {
             vertices[i] = new Vertex(new Vector3(tri.vertices[i].worldPos.x / cam.size.x, tri.vertices[i].worldPos.y / cam.size.y, tri.vertices[i].worldPos.z), tri.vertices[i].color);
         }
 
-        return new Triangle(vertices, tri.color);
+        return new Triangle(vertices, tri.worldNormal);
     }
 
     private static List<Vector2> findLine(Vector3 p1, Vector3 p2)
@@ -298,7 +325,7 @@ public class Renderer {
 
             pane.add(renderPanel, BorderLayout.CENTER);
 
-            frame.setSize(50, 50);
+            frame.setSize(150, 150);
             frame.setVisible(true);
             frame.setResizable(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

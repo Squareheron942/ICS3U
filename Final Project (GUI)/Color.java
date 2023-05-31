@@ -50,8 +50,16 @@ public class Color {
         );
     }
 
+    Color mul(float f) {
+        return new Color(
+            this.r * f,
+            this.g * f,
+            this.b * f
+        );
+    }
+
     @Override
     public String toString() {
-        return "{r: " + r + ", g: " + g + ", b: " + b + "}";
+        return "Color{r: " + r + ", g: " + g + ", b: " + b + "}";
     }
 }

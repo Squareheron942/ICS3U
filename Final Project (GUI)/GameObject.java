@@ -8,11 +8,25 @@ public class GameObject {
     GameObject(Mesh mesh, Material mat) {
         this.mesh = mesh;
         this.mats[0] = mat;
+        for (Triangle t : mesh.tris) {
+            if (t == null) continue;
+            for (Vertex v : t.vertices) {
+                position.add(v.worldPos);
+            }
+        }
+        position.div(3);
     }
 
     GameObject(Mesh _mesh, Material[] _mats) {
         mesh = _mesh;
         mats = _mats;
+        for (Triangle t : mesh.tris) {
+            if (t == null) continue;
+            for (Vertex v : t.vertices) {
+                position.add(v.worldPos);
+            }
+        }
+        position.div(3);
     }
 
     public void setRotation(Vector3 rotation) {
@@ -61,9 +75,9 @@ public class GameObject {
         
     // }
 
-    public Vector3 position() {
-        return this.position;
-    }
+    public Vector3 position() { return this.position;}
+    public Vector3 rotation() { return this.rotation;}
+    public Vector3 scale() { return this.scale;}
 
     public void setPosition(Vector3 position) {
         for (int i = 0; i < mesh.tris.length; i++) {
@@ -101,5 +115,9 @@ public class GameObject {
             }
         }
         this.position.z = z;
+    }
+
+    @Override public String toString() {
+        return "{mesh:" + mesh.toString() + ", material:" + ((mats[0] == null) ? null : mats[0].toString()) + "}";
     }
 }

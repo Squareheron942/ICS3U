@@ -31,8 +31,15 @@ public class Vertex {
         this.uv = uv;
     }
 
+    Vertex(Vector3 position, Color color, Vector2 uv, Vector3 normal) {
+        this.worldPos = position;
+        this.color = color;
+        this.normal = normal;
+        this.uv = uv;
+    }
+
     @Override
     public String toString() {
-        return "{\nnormal: " + normal.toString() + ", \nposition: " + worldPos.toString() + ", \ncolor: " + color.toString() + "\n}";
+        return "Vertex{\nnormal: " + (normal == null ? null : normal.toString()) + ", \nposition: " + (worldPos == null ? null : worldPos.toString()) + ", \ncolor: " + (color == null ? null : color.toString()) + "\n}";
     }
 }

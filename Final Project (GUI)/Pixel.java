@@ -1,19 +1,26 @@
 public class Pixel {
     Color color;
     Vector3 worldNormal;
+    Vector2 uv;
+    Vector3 bary;
+    Material mat;
+    Vector2 fragCoord;
+    boolean frontFacing;
 
-    Pixel(Vector3 worldNormal, Color color) {
-        this.color = color;
+    Pixel(Color color, Vector3 worldNormal, Vector2 uv, Vector3 bary, Material mat, Vector2 fragCoord, boolean frontFacing) {
         this.worldNormal = worldNormal;
+        this.uv = uv;
+        this.bary = bary;
+        this.mat = mat;
+        this.fragCoord = fragCoord;
+        this.frontFacing = frontFacing;
+        this.color = color;
     }
 
-    Pixel() {
-        this.color = new Color(0, 0, 0);
-        this.worldNormal = new Vector3(0, 0, 0);
-    }
+    Pixel() {}
 
     @Override
     public String toString() {
-        return "{normal: " + worldNormal + ", color: " + color + "}";
+        return "{normal: " + worldNormal + "}";
     }
 }

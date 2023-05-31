@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 public class RenderFrame extends JFrame implements KeyListener {
     List<Integer> keysHeld = new ArrayList<Integer>();
-    BufferedImage img = new BufferedImage(600, 600, BufferedImage.TYPE_INT_RGB);
+    BufferedImage img = new BufferedImage(160, 120, BufferedImage.TYPE_INT_RGB);
 
     RenderFrame(String title) {
         super(title);
