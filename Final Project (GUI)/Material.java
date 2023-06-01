@@ -3,10 +3,6 @@ public class Material {
     Texture _MainTex = new Texture();
     Color color = null;
 
-    // Material(MaterialProperty[] props, Shader shader) {
-    //     this.shader = shader;
-    // }
-
     Material(Color color) {
         this.color = color;
     }

@@ -1,6 +1,10 @@
 import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
+
 
 public class Main {
     static Scene scene = new Scene(); 
@@ -18,19 +22,19 @@ public class Main {
 
         // scene.add(cube);
 
-        Cube c2 = new Cube(
-            new Vector3(-1000, 0, -1000), // position
-            new Vector3(30, 30, 30), // dimensions
-            new Vector3(), // rotation
-            new Color(1, 0, 0) // vertex color
-        );
+        // Cube c2 = new Cube(
+        //     new Vector3(-1000, 0, -1000), // position
+        //     new Vector3(30, 30, 30), // dimensions
+        //     new Vector3(), // rotation
+        //     new Color(1, 0, 0) // vertex color
+        // );
 
-        scene.add(c2);
+        // scene.add(c2);
 
         GameObject o = OBJReader.read(new File("sphere.obj"), new Vector3(100, 100, 100));
         scene.add(o);
 
-        System.out.println(o);
+        // System.out.println(c2);
 
         scene.add(
             new GameObject(
@@ -73,6 +77,8 @@ public class Main {
 
         Renderer.init(scene, cam);
 
+        System.out.println(Vector3.normalize(new Vector3(1, 1, 1)));
+
         Timer timer = new Timer();
         TimerTask t = new TimerTask() {
             public void run() {
@@ -109,8 +115,9 @@ public class Main {
             } else {
 
             }
-            // c2.setPosition(new Vector3((LUTs.sin(counter) * 300) - 1000, 0, -1000));
-            // cube.setRotation(new Vector3(counter, 0, 0));
+            // c2.setDimensions(new Vector3((LUTs.sin(counter) * 100), 100, 100));
+            // o.setPosition(new Vector3(0, 0, -5));
+            o.setRotation(new Vector3(counter, 0, 0));
             // scene.children.set(0, cube);
             Color[][] fbuf = Renderer.render(scene, cam);
             Renderer.draw(fbuf);

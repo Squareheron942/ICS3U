@@ -22,7 +22,7 @@ public class Cube extends GameObject {
         return this.dimensions;
     }
 
-    public String toString() {
-        return "{position: " + position + "}";
-    }
+    // public String toString() {
+    //     return "Cube{position: " + position + "}";
+    // }
 }

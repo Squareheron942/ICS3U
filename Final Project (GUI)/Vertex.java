@@ -40,6 +40,6 @@ public class Vertex {
 
     @Override
     public String toString() {
-        return "Vertex{\nnormal: " + (normal == null ? null : normal.toString()) + ", \nposition: " + (worldPos == null ? null : worldPos.toString()) + ", \ncolor: " + (color == null ? null : color.toString()) + "\n}";
+        return "Vertex{normal: " + (normal == null ? null : normal.toString()) + ", position: " + (worldPos == null ? null : worldPos.toString()) + ", color: " + (color == null ? null : color.toString()) + "}";
     }
 }

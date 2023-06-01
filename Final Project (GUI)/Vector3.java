@@ -64,7 +64,7 @@ public class Vector3 {
     }
 
     static float magnitude(Vector3 v) {
-        return (float)Math.abs(Math.sqrt(v.x * v.x + v.y * v.y * v.z * v.z));
+        return (float)Math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
     }
 
     @Override

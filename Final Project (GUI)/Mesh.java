@@ -9,6 +9,11 @@ public class Mesh {
     }
 
     @Override public String toString() {
-        return Arrays.deepToString(tris);
+        String o = "{";
+        for (Triangle t : tris) {
+            o += "  " + t + ",\n";
+        }
+        o += "},";
+        return o;
     }
 }

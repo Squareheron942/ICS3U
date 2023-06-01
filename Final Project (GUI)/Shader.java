@@ -7,6 +7,7 @@ public class Shader {
     }};
     boolean zWrite = true;
     boolean zTest = true;
+    boolean shadeSmooth = true;
     
 
     // Shader(Pass[] passes, boolean[] attributes) {
@@ -19,9 +20,9 @@ public class Shader {
     }
 
     Color frag(Pixel i) {
-        Vector3 sunDir = new Vector3(1, 1, 1);
+        Vector3 sunDir = new Vector3(-0.5773502691896258f, -0.5773502691896258f, -0.5773502691896258f);
         // return new Color(0xff00ff);
         // return i.mat._MainTex.get(i.uv);
-        return i.color.mul(i.mat._MainTex.get(i.uv)).mul(Vector3.dot(Vector3.normalize(sunDir), Vector3.normalize(i.worldNormal)) / 2f + 0.5f);
+        return i.color.mul(i.mat._MainTex.get(i.uv)).mul(Vector3.dot(sunDir, i.worldNormal) / 2f + 0.5f);
     }
 }

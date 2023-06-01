@@ -14,6 +14,6 @@ public class Triangle {
 
     @Override
     public String toString() {
-        return "Triangle{" + vertices[0] + ", " + vertices[1] + ", " + vertices[2] + ", normal:" + worldNormal + "}";
+        return "Triangle{\n   vertices: [\n      " + vertices[0] + ",\n      " + vertices[1] + ",\n      " + vertices[2] + "\n   ],\n   normal: " + worldNormal + "\n},";
     }
 }

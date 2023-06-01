@@ -2,7 +2,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.*;
-import java.io.File;
 
 import javax.swing.*;
 
@@ -62,15 +61,14 @@ public class Renderer {
                                 try {
                                     Vector3 bary = persp_bary(v1.worldPos, v2.worldPos, v3.worldPos, p, invZ);
                                     float zVal = 1 - ((cam.nearClip - 1 / (bary.x / v1.worldPos.z + bary.y / v2.worldPos.z + bary.z / v3.worldPos.z)) / (cam.farClip - cam.nearClip));
-                                    Vector2 uv = new Vector2(bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x, bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y);
-                                    // Vector3 normal = Vector3.normalize(new Vector3(bary.x * v1.normal.x + bary.y * v2.normal.x + bary.z * v3.normal.x, bary.x * v1.normal.y + bary.y * v2.normal.y + bary.z * v3.normal.y, bary.x * v1.normal.z + bary.y * v2.normal.z + bary.z * v3.normal.z));
-                                    Vector3 normal = t.worldNormal;
-                                    Color vCol = new Color(bary.x * v1.color.r + bary.y * v2.color.r + bary.z * v3.color.r, bary.x * v1.color.g + bary.y * v2.color.g + bary.z * v3.color.g, bary.x * v1.color.b + bary.y * v2.color.b + bary.z * v3.color.b);
                                     Color o = null;
 
                                     if (zVal <= 1 && zVal >= 0) { // ignore if outside of camera view
                                         if (m.shader != null) { // if no shader then make magenta
                                             if (!m.shader.zTest || (m.shader.zTest && zbuf[x + renderPanel.img.getWidth() >> 1][y + renderPanel.img.getHeight() >> 1] < zVal)) {
+                                                Vector2 uv = new Vector2(bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x, bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y);
+                                                Vector3 normal = m.shader.shadeSmooth ? new Vector3(bary.x * v1.normal.x + bary.y * v2.normal.x + bary.z * v3.normal.x, bary.x * v1.normal.y + bary.y * v2.normal.y + bary.z * v3.normal.y, bary.x * v1.normal.z + bary.y * v2.normal.z + bary.z * v3.normal.z) : t.worldNormal;
+                                                Color vCol = new Color(bary.x * v1.color.r + bary.y * v2.color.r + bary.z * v3.color.r, bary.x * v1.color.g + bary.y * v2.color.g + bary.z * v3.color.g, bary.x * v1.color.b + bary.y * v2.color.b + bary.z * v3.color.b);
                                                 switch (renderMode) {
                                                     case 0: // regular shading
                                                         Pixel frag = new Pixel(vCol, normal, uv, bary, m, new Vector2(x, y), true);
@@ -84,10 +82,10 @@ public class Renderer {
                                                         o = new Color(bary.x, bary.y, bary.z);
                                                         break;
                                                     case 3: // uv coords
-                                                        o = new Color(bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x, bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y, 0);
+                                                        o = new Color(uv.x, uv.y, 0);
                                                         break;
                                                     case 4: // normals
-                                                        o = new Color(normal.x, normal.y, normal.z);
+                                                        o = new Color(normal.x * 0.5f + 0.5f, normal.y * 0.5f + 0.5f, normal.z * 0.5f + 0.5f);
                                                         break;
                                                 }
                                                 fbuf[x + renderPanel.img.getWidth() >> 1][-y + renderPanel.img.getHeight() >> 1] = o;
@@ -107,43 +105,6 @@ public class Renderer {
                 }
             }
         }
-
-        // Color.lerp(
-        //                                             fbuf[x][y].color,
-        //                                             t.color.mul(
-        //                                                 m._MainTex.get(
-        //                                                     new Vector2(
-        //                                                         bary.x * v1.uv.x + bary.y * v2.uv.x + bary.z * v3.uv.x,
-        //                                                         bary.x * v1.uv.y + bary.y * v2.uv.y + bary.z * v3.uv.y
-        //                                                     )
-        //                                                 )
-        //                                             ),
-        //                                             t.color.a
-        //                                         )
-
-        // for (GameObject object : objects) {
-        //     for (Triangle t : object.mesh.tris) {
-        //         List<Vector2> a = findLine(t.vertices[0].worldPos, t.vertices[1].worldPos);
-        //         List<Vector2> b = findLine(t.vertices[1].worldPos, t.vertices[2].worldPos);
-        //         List<Vector2> c = findLine(t.vertices[2].worldPos, t.vertices[0].worldPos);
-
-        //         try {
-        //             for (int k = 0; k < a.size(); k++) {
-        //                 fbuf[(int)a.get(k).x + img.getWidth() >> 1][(int)-a.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[0].color, t.vertices[1].color, k / (float)a.size()));
-        //             }
-        //         } catch (Exception e) {} 
-        //         try {
-        //             for (int k = 0; k < b.size(); k++) {                    
-        //                 fbuf[(int)b.get(k).x + img.getWidth() >> 1][(int)-b.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[1].color, t.vertices[2].color, k / (float)b.size()));
-        //             }
-        //         } catch (Exception e) {} 
-        //         try {
-        //             for (int k = 0; k < c.size(); k++) {
-        //                 fbuf[(int)c.get(k).x + img.getWidth() >> 1][(int)-c.get(k).y + img.getHeight() >> 1] = new Pixel(new Vector3(), Color.lerp(t.vertices[2].color, t.vertices[0].color, k / (float)c.size()));
-        //             }
-        //         } catch (Exception e) {} 
-        //     }
-        // }
         return fbuf;
     }
 
