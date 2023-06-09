@@ -1,0 +1,7 @@
+{
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.customCommand": "javac -d build *.java && java -cp build Main",
+    "code-runner.executorMap": {
+        "java": "cd ~/Code/Java/ICS3U/Final\\ Project\\ \\(GUI\\) && find ./src -type f -name \"*.java\" > ./sources.txt || dir src /b /s *.java > ./sources.txt && javac -d build @sources.txt && java -cp build Main"
+    }
+}

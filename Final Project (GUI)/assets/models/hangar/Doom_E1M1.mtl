@@ -1,0 +1,230 @@
+# MTL for Doom.wad, map E1M1
+# Created by GZDoom Builder 2.3.0.2787
+
+newmtl Default
+Kd 1.0 1.0 1.0
+
+newmtl BIGDOOR2
+Kd 1.0 1.0 1.0
+map_Kd hangar/BIGDOOR2.PNG
+
+newmtl BIGDOOR4
+Kd 1.0 1.0 1.0
+map_Kd hangar/BIGDOOR4.PNG
+
+newmtl BRNBIGC
+Kd 1.0 1.0 1.0
+map_Kd hangar/BRNBIGC.PNG
+
+newmtl BRNBIGL
+Kd 1.0 1.0 1.0
+map_Kd hangar/BRNBIGL.PNG
+
+newmtl BRNBIGR
+Kd 1.0 1.0 1.0
+map_Kd hangar/BRNBIGR.PNG
+
+newmtl BROWN1
+Kd 1.0 1.0 1.0
+map_Kd hangar/BROWN1.PNG
+
+newmtl BROWN144
+Kd 1.0 1.0 1.0
+map_Kd hangar/BROWN144.PNG
+
+newmtl BROWN96
+Kd 1.0 1.0 1.0
+map_Kd hangar/BROWN96.PNG
+
+newmtl BROWNGRN
+Kd 1.0 1.0 1.0
+map_Kd hangar/BROWNGRN.PNG
+
+newmtl COMPSPAN
+Kd 1.0 1.0 1.0
+map_Kd hangar/COMPSPAN.PNG
+
+newmtl COMPTALL
+Kd 1.0 1.0 1.0
+map_Kd hangar/COMPTALL.PNG
+
+newmtl COMPTILE
+Kd 1.0 1.0 1.0
+map_Kd hangar/COMPTILE.PNG
+
+newmtl COMPUTE2
+Kd 1.0 1.0 1.0
+map_Kd hangar/COMPUTE2.PNG
+
+newmtl COMPUTE3
+Kd 1.0 1.0 1.0
+map_Kd hangar/COMPUTE3.PNG
+
+newmtl DOOR3
+Kd 1.0 1.0 1.0
+map_Kd hangar/DOOR3.PNG
+
+newmtl DOORSTOP
+Kd 1.0 1.0 1.0
+map_Kd hangar/DOORSTOP.PNG
+
+newmtl DOORTRAK
+Kd 1.0 1.0 1.0
+map_Kd hangar/DOORTRAK.PNG
+
+newmtl EXITDOOR
+Kd 1.0 1.0 1.0
+map_Kd hangar/EXITDOOR.PNG
+
+newmtl EXITSIGN
+Kd 1.0 1.0 1.0
+map_Kd hangar/EXITSIGN.PNG
+
+newmtl LITE3
+Kd 1.0 1.0 1.0
+map_Kd hangar/LITE3.PNG
+
+newmtl NUKE24
+Kd 1.0 1.0 1.0
+map_Kd hangar/NUKE24.PNG
+
+newmtl PLANET1
+Kd 1.0 1.0 1.0
+map_Kd hangar/PLANET1.PNG
+
+newmtl SLADWALL
+Kd 1.0 1.0 1.0
+map_Kd hangar/SLADWALL.PNG
+
+newmtl STARG3
+Kd 1.0 1.0 1.0
+map_Kd hangar/STARG3.PNG
+
+newmtl STARGR1
+Kd 1.0 1.0 1.0
+map_Kd hangar/STARGR1.PNG
+
+newmtl STARTAN1
+Kd 1.0 1.0 1.0
+map_Kd hangar/STARTAN1.PNG
+
+newmtl STARTAN3
+Kd 1.0 1.0 1.0
+map_Kd hangar/STARTAN3.PNG
+
+newmtl STEP1
+Kd 1.0 1.0 1.0
+map_Kd hangar/STEP1.PNG
+
+newmtl STEP6
+Kd 1.0 1.0 1.0
+map_Kd hangar/STEP6.PNG
+
+newmtl SUPPORT2
+Kd 1.0 1.0 1.0
+map_Kd hangar/SUPPORT2.PNG
+
+newmtl SW1COMP
+Kd 1.0 1.0 1.0
+map_Kd hangar/SW1COMP.PNG
+
+newmtl SW1STRTN
+Kd 1.0 1.0 1.0
+map_Kd hangar/SW1STRTN.PNG
+
+newmtl TEKWALL1
+Kd 1.0 1.0 1.0
+map_Kd hangar/TEKWALL1.PNG
+
+newmtl TEKWALL4
+Kd 1.0 1.0 1.0
+map_Kd hangar/TEKWALL4.PNG
+
+newmtl CEIL3_5
+Kd 1.0 1.0 1.0
+map_Kd hangar/CEIL3_5.PNG
+
+newmtl CEIL5_1
+Kd 1.0 1.0 1.0
+map_Kd hangar/CEIL5_1.PNG
+
+newmtl CEIL5_2
+Kd 1.0 1.0 1.0
+map_Kd hangar/CEIL5_2.PNG
+
+newmtl F_SKY1
+Kd 1.0 1.0 1.0
+map_Kd hangar/F_SKY1.PNG
+
+newmtl FLAT14
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLAT14.PNG
+
+newmtl FLAT18
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLAT18.PNG
+
+newmtl FLAT20
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLAT20.PNG
+
+newmtl FLAT23
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLAT23.PNG
+
+newmtl FLAT5_5
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLAT5_5.PNG
+
+newmtl FLOOR1_1
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLOOR1_1.PNG
+
+newmtl FLOOR4_8
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLOOR4_8.PNG
+
+newmtl FLOOR5_1
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLOOR5_1.PNG
+
+newmtl FLOOR5_2
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLOOR5_2.PNG
+
+newmtl FLOOR6_2
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLOOR6_2.PNG
+
+newmtl FLOOR7_1
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLOOR7_1.PNG
+
+newmtl FLOOR7_2
+Kd 1.0 1.0 1.0
+map_Kd hangar/FLOOR7_2.PNG
+
+newmtl NUKAGE3
+Kd 1.0 1.0 1.0
+map_Kd hangar/NUKAGE3.PNG
+
+newmtl STEP2
+Kd 1.0 1.0 1.0
+map_Kd hangar/STEP2.PNG
+
+newmtl TLITE6_1
+Kd 1.0 1.0 1.0
+map_Kd hangar/TLITE6_1.PNG
+
+newmtl TLITE6_4
+Kd 1.0 1.0 1.0
+map_Kd hangar/TLITE6_4.PNG
+
+newmtl TLITE6_5
+Kd 1.0 1.0 1.0
+map_Kd hangar/TLITE6_5.PNG
+
+newmtl TLITE6_6
+Kd 1.0 1.0 1.0
+map_Kd hangar/TLITE6_6.PNG
+

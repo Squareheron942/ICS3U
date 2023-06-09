@@ -1,1 +1,3 @@
 *.class
+sources.txt
+*.code-workspace
