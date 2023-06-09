@@ -17,15 +17,9 @@ public class RenderPanel extends JPanel implements KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
-<<<<<<< HEAD:Final Project (GUI)/src/rendering/RenderPanel.java
         g2.drawImage(scale(img, getHeight() * 0.005f, AffineTransformOp.TYPE_NEAREST_NEIGHBOR), ((int)(getHeight() / (float)getWidth()) * 300), 0, null);
         // g2.drawImage(img, 0, 0, null);
         // img = new BufferedImage(300, 200, BufferedImage.TYPE_INT_RGB);
-=======
-        g2.drawImage(scale(img, 4, AffineTransformOp.TYPE_NEAREST_NEIGHBOR), 0, 0, null);
-        // g2.drawImage(img, 0, 0, null);
-        img = new BufferedImage(getWidth() >> 2, getHeight() >> 2, BufferedImage.TYPE_INT_RGB);
->>>>>>> parent of f155222 (Added vertex shader support):Final Project (GUI)/RenderPanel.java
     }
 
     @Override public void keyPressed(KeyEvent e) {

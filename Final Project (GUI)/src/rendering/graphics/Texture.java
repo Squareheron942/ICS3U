@@ -9,15 +9,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class Texture {
-<<<<<<< HEAD:Final Project (GUI)/src/rendering/graphics/Texture.java
     private BufferedImage img = null;
     public Texture() {};
     public Texture(File img) {
-=======
-    BufferedImage img = null;
-    Texture() {};
-    Texture(File img) {
->>>>>>> parent of f155222 (Added vertex shader support):Final Project (GUI)/Texture.java
+
         try {
             this.img = ImageIO.read(img);
         } catch (IOException e) {
